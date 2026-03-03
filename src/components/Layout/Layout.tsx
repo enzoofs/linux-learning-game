@@ -1,15 +1,14 @@
 import type { ReactNode } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-
-type View = 'terminal' | 'map' | 'journal' | 'achievements' | 'stats';
+import type { AppView } from '../../types';
 
 interface LayoutProps {
-  currentView: View;
-  onViewChange: (view: View) => void;
+  currentView: AppView;
+  onViewChange: (view: AppView) => void;
   children: ReactNode;
 }
 
-const NAV_TABS: { id: View; label: string }[] = [
+const NAV_TABS: { id: AppView; label: string }[] = [
   { id: 'terminal', label: '> Terminal' },
   { id: 'map', label: 'Árvore de Skills' },
   { id: 'journal', label: 'Diário' },
