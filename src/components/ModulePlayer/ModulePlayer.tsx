@@ -63,8 +63,14 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
   const currentDrill = module.drills[currentDrillIndex];
   const currentBoss = module.boss.steps[currentBossStep];
 
-  // Initialize phase messages
+  // Initialize phase messages (guard against duplicate fires)
+  const lastInitRef = useRef('');
+
   useEffect(() => {
+    const key = `${phase}-${currentDrillIndex}-${currentBossStep}`;
+    if (key === lastInitRef.current) return;
+    lastInitRef.current = key;
+
     if (phase === 'sandbox') {
       terminal.resetWithLines([
         { type: 'system', text: '═══ MODO SANDBOX ═══' },
