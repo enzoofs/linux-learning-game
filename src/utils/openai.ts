@@ -8,6 +8,8 @@ interface ModuleContext {
   phase: string;
 }
 
+const STORAGE_KEY = 'cli-quest-openai-key';
+
 const SYSTEM_PROMPT = `Você é um assistente especialista em Linux e linha de comando (CLI).
 Você ajuda estudantes que estão aprendendo comandos no terminal pela primeira vez.
 Responda sempre em português brasileiro (pt-BR).
@@ -15,11 +17,23 @@ Seja conciso e use exemplos práticos.
 Use formatação simples (sem markdown pesado).
 Se o aluno perguntar algo fora do tema, redirecione gentilmente para Linux/CLI.`;
 
+export function getStoredApiKey(): string {
+  return localStorage.getItem(STORAGE_KEY) || '';
+}
+
+export function setStoredApiKey(key: string): void {
+  if (key.trim()) {
+    localStorage.setItem(STORAGE_KEY, key.trim());
+  } else {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+}
+
 export async function sendChatMessage(
   messages: ChatMessage[],
+  apiKey: string,
   moduleContext?: ModuleContext
 ): Promise<string> {
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
   if (!apiKey) {
     throw new Error('API_KEY_MISSING');
   }
