@@ -5,6 +5,7 @@ import { Briefing } from '../Briefing/Briefing';
 import { useTerminal } from '../../hooks/useTerminal';
 import { useGameStore } from '../../stores/gameStore';
 import { analyzeCommand } from '../../utils/commandParser';
+import { getLearnedCommands } from '../../data/modules';
 
 const DIFFICULTY_LABELS: Record<string, string> = {
   easy: 'FÁCIL',
@@ -30,11 +31,13 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
   });
   const [currentDrillIndex, setCurrentDrillIndex] = useState(() => {
     const s = useGameStore.getState();
-    return s.currentModuleId === module.id ? s.currentDrillIndex : 0;
+    if (s.currentModuleId !== module.id) return 0;
+    return s.currentDrillIndex < module.drills.length ? s.currentDrillIndex : 0;
   });
   const [currentBossStep, setCurrentBossStep] = useState(() => {
     const s = useGameStore.getState();
-    return s.currentModuleId === module.id ? s.currentBossStep : 0;
+    if (s.currentModuleId !== module.id) return 0;
+    return s.currentBossStep < module.boss.steps.length ? s.currentBossStep : 0;
   });
   const [drillStartTime, setDrillStartTime] = useState(0);
   const [drillAttempts, setDrillAttempts] = useState(0);
@@ -123,6 +126,22 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     }
 
     if (!matched) {
+      // Check learned commands from completed modules
+      const { completedModules } = useGameStore.getState();
+      const learnedCommands = getLearnedCommands(completedModules);
+      for (const learnedCmd of learnedCommands) {
+        if (learnedCmd.pattern.test(cmd)) {
+          if (learnedCmd.output) {
+            terminal.addLine({ type: 'output', text: learnedCmd.output });
+          }
+          terminal.addLine({ type: 'learned', text: '(comando aprendido em módulo anterior)' });
+          matched = true;
+          break;
+        }
+      }
+    }
+
+    if (!matched) {
       terminal.addLine({ type: 'system', text: `${cmd}: comando simulado — tente comandos relacionados ao tema deste módulo!` });
     }
 
@@ -197,7 +216,23 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     } else if (result.type === 'typo') {
       terminal.addLine({ type: 'feedback', text: result.message });
     } else {
-      terminal.addLine({ type: 'error', text: result.message });
+      // Check if it's a learned command before showing generic error
+      const { completedModules } = useGameStore.getState();
+      const learnedCommands = getLearnedCommands(completedModules);
+      let isLearned = false;
+      for (const learnedCmd of learnedCommands) {
+        if (learnedCmd.pattern.test(cmd)) {
+          if (learnedCmd.output) {
+            terminal.addLine({ type: 'output', text: learnedCmd.output });
+          }
+          terminal.addLine({ type: 'learned', text: 'Comando reconhecido, mas não é a resposta para este exercício.' });
+          isLearned = true;
+          break;
+        }
+      }
+      if (!isLearned) {
+        terminal.addLine({ type: 'error', text: result.message });
+      }
     }
 
     terminal.setInputValue('');
@@ -251,7 +286,23 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     } else if (result.type === 'feedback') {
       terminal.addLine({ type: 'feedback', text: result.message });
     } else {
-      terminal.addLine({ type: 'error', text: result.message });
+      // Check if it's a learned command before showing generic error
+      const { completedModules } = useGameStore.getState();
+      const learnedCommands = getLearnedCommands(completedModules);
+      let isLearned = false;
+      for (const learnedCmd of learnedCommands) {
+        if (learnedCmd.pattern.test(cmd)) {
+          if (learnedCmd.output) {
+            terminal.addLine({ type: 'output', text: learnedCmd.output });
+          }
+          terminal.addLine({ type: 'learned', text: 'Comando reconhecido, mas não é a resposta para este exercício.' });
+          isLearned = true;
+          break;
+        }
+      }
+      if (!isLearned) {
+        terminal.addLine({ type: 'error', text: result.message });
+      }
     }
 
     terminal.setInputValue('');
