@@ -10,32 +10,32 @@ export const dataWranglingModule: Module = {
 
   briefing: {
     concept:
-      `Real-world data is messy. Log files, CSVs, database exports — they all need cleaning, sorting, and summarizing. Linux gives you a toolkit for wrangling data right from the command line.\n\n` +
-      `**Sorting and deduplicating:**\n` +
-      `• **sort** — Sort lines alphabetically. Add \`-n\` for numeric sort, \`-r\` for reverse.\n` +
-      `• **uniq** — Remove *adjacent* duplicate lines (that's why you almost always \`sort\` first). Add \`-c\` to count occurrences.\n\n` +
-      `**Extracting columns:**\n` +
-      `• **cut** — Extract specific columns from structured text. Use \`-d\` to set the delimiter and \`-f\` to pick field numbers.\n` +
-      `• **awk** — A powerful pattern-scanning language. At its simplest, it extracts and computes on columns: \`awk '{print $2}'\` prints the 2nd column.\n\n` +
-      `**Transforming characters:**\n` +
-      `• **tr** — Translate or delete characters. Great for changing delimiters, converting case, or removing unwanted characters.\n\n` +
-      `**Common patterns:**\n` +
-      `• \`sort file | uniq\` — Sort then deduplicate.\n` +
-      `• \`sort file | uniq -c | sort -rn\` — Count occurrences, show most frequent first.\n` +
-      `• \`cut -d',' -f2 data.csv\` — Extract the 2nd column from a CSV.\n` +
-      `• \`awk -F',' '{sum += $3} END {print sum}' data.csv\` — Sum a numeric column.`,
+      `Dados do mundo real são bagunçados. Arquivos de log, CSVs, exports de banco de dados — todos precisam de limpeza, ordenação e resumo. O Linux te dá um kit de ferramentas para manipular dados direto da linha de comando.\n\n` +
+      `**Ordenando e deduplicando:**\n` +
+      `• **sort** — Ordena linhas alfabeticamente. Adicione \`-n\` para ordenação numérica, \`-r\` para reverso.\n` +
+      `• **uniq** — Remove linhas duplicadas *adjacentes* (por isso você quase sempre faz \`sort\` antes). Adicione \`-c\` para contar ocorrências.\n\n` +
+      `**Extraindo colunas:**\n` +
+      `• **cut** — Extrai colunas específicas de texto estruturado. Use \`-d\` para definir o delimitador e \`-f\` para escolher números de campo.\n` +
+      `• **awk** — Uma linguagem poderosa de processamento de padrões. No mais simples, extrai e computa colunas: \`awk '{print $2}'\` imprime a 2a coluna.\n\n` +
+      `**Transformando caracteres:**\n` +
+      `• **tr** — Traduz ou deleta caracteres. Ótimo para mudar delimitadores, converter maiúsculas/minúsculas ou remover caracteres indesejados.\n\n` +
+      `**Padrões comuns:**\n` +
+      `• \`sort file | uniq\` — Ordena e depois deduplica.\n` +
+      `• \`sort file | uniq -c | sort -rn\` — Conta ocorrências, mostra os mais frequentes primeiro.\n` +
+      `• \`cut -d',' -f2 data.csv\` — Extrai a 2a coluna de um CSV.\n` +
+      `• \`awk -F',' '{sum += $3} END {print sum}' data.csv\` — Soma uma coluna numérica.`,
     analogy:
-      'Think of your data as a spreadsheet. `cut` selects columns, `sort` orders rows, `uniq` removes duplicates, and `awk` is the formula engine that can do anything. `tr` is like find-and-replace for individual characters — changing every comma to a tab, or every lowercase letter to uppercase.',
+      'Pense nos seus dados como uma planilha. `cut` seleciona colunas, `sort` ordena linhas, `uniq` remove duplicatas, e `awk` é o motor de fórmulas que pode fazer qualquer coisa. `tr` é como buscar-e-substituir para caracteres individuais — trocando cada vírgula por tab, ou cada letra minúscula por maiúscula.',
     syntax:
       'sort [options] file          # sort lines\n  -n                          # numeric sort (10 after 9, not after 1)\n  -r                          # reverse order\n  -k N                        # sort by column N\nuniq [options]                # remove adjacent duplicates\n  -c                          # prefix lines with occurrence count\ncut -d DELIM -f FIELDS file   # extract columns\n  -d\',\'                       # use comma as delimiter\n  -f3                         # extract field 3\n  -f1,3                       # extract fields 1 and 3\nawk \'pattern {action}\' file   # pattern scanning and processing\n  -F\',\'                       # set field separator to comma\n  {print $2}                  # print 2nd column\n  {sum += $3} END {print sum} # sum a column\ntr SET1 SET2                  # translate characters\n  tr \',\' \'\\t\'                 # commas to tabs\n  tr \'[:lower:]\' \'[:upper:]\'  # lowercase to uppercase',
     examples: [
-      { command: 'sort names.txt', output: 'Alice\nBob\nCharlie\nDiana\nEve', explanation: 'Sorts lines alphabetically (A-Z). This is the default behavior.' },
-      { command: 'sort names.txt | uniq', output: 'Alice\nBob\nCharlie\nDiana\nEve', explanation: 'Sorts then removes duplicate lines. `uniq` only removes *adjacent* duplicates, so always sort first.' },
-      { command: 'sort names.txt | uniq -c | sort -rn', output: '      3 Bob\n      2 Alice\n      2 Eve\n      1 Charlie\n      1 Diana', explanation: 'The classic frequency count: sort, count duplicates, then sort numerically in reverse to see the most common items first.' },
-      { command: "cut -d',' -f3 data.csv", output: '29.99\n49.99\n9.99\n79.99\n19.99', explanation: 'Extracts the 3rd field from a comma-separated file. `-d\',\'` sets comma as delimiter, `-f3` picks field 3.' },
-      { command: "awk -F',' '{ sum += $3 } END { print sum }' data.csv", output: '189.95', explanation: 'Sets comma as field separator, accumulates the 3rd column into `sum`, then prints the total at the end.' },
-      { command: "awk -F',' '{ print $1, $3 }' data.csv", output: 'Widget 29.99\nGadget 49.99\nPlug 9.99\nScreen 79.99\nCable 19.99', explanation: 'Prints the 1st and 3rd columns from the CSV. `awk` auto-splits each line into fields.' },
-      { command: "echo 'hello world' | tr '[:lower:]' '[:upper:]'", output: 'HELLO WORLD', explanation: 'Translates every lowercase character to uppercase.' },
+      { command: 'sort names.txt', output: 'Alice\nBob\nCharlie\nDiana\nEve', explanation: 'Ordena linhas alfabeticamente (A-Z). Esse é o comportamento padrão.' },
+      { command: 'sort names.txt | uniq', output: 'Alice\nBob\nCharlie\nDiana\nEve', explanation: 'Ordena e depois remove linhas duplicadas. `uniq` só remove duplicatas *adjacentes*, então sempre ordene antes.' },
+      { command: 'sort names.txt | uniq -c | sort -rn', output: '      3 Bob\n      2 Alice\n      2 Eve\n      1 Charlie\n      1 Diana', explanation: 'A clássica contagem de frequência: ordena, conta duplicatas, depois ordena numericamente em reverso para ver os mais comuns primeiro.' },
+      { command: "cut -d',' -f3 data.csv", output: '29.99\n49.99\n9.99\n79.99\n19.99', explanation: 'Extrai o 3o campo de um arquivo separado por vírgulas. `-d\',\'` define vírgula como delimitador, `-f3` pega o campo 3.' },
+      { command: "awk -F',' '{ sum += $3 } END { print sum }' data.csv", output: '189.95', explanation: 'Define vírgula como separador de campo, acumula a 3a coluna em `sum` e depois imprime o total no final.' },
+      { command: "awk -F',' '{ print $1, $3 }' data.csv", output: 'Widget 29.99\nGadget 49.99\nPlug 9.99\nScreen 79.99\nCable 19.99', explanation: 'Imprime a 1a e 3a colunas do CSV. `awk` divide automaticamente cada linha em campos.' },
+      { command: "echo 'hello world' | tr '[:lower:]' '[:upper:]'", output: 'HELLO WORLD', explanation: 'Converte cada caractere minúsculo para maiúsculo.' },
     ],
   },
 
@@ -63,21 +63,21 @@ export const dataWranglingModule: Module = {
       { pattern: /^ls$/, output: 'data.csv  names.txt  sales.txt', description: 'List files' },
     ],
     contextHints: [
-      'Try `sort names.txt` to sort the names alphabetically.',
-      'Use `sort names.txt | uniq` to remove duplicates after sorting.',
-      'Count duplicates with `sort names.txt | uniq -c`.',
-      'Get a frequency ranking: `sort names.txt | uniq -c | sort -rn`.',
-      'Extract a CSV column: `cut -d\',\' -f3 data.csv` (gets prices).',
-      'Sum a column with awk: `awk -F\',\' \'{ sum += $3 } END { print sum }\' data.csv`.',
-      'View the raw data first: `cat names.txt`, `cat data.csv`, `cat sales.txt`.',
-      'Transform characters with `tr`: try `echo \'hello\' | tr \'[:lower:]\' \'[:upper:]\'`.',
+      'Tente `sort names.txt` para ordenar os nomes alfabeticamente.',
+      'Use `sort names.txt | uniq` para remover duplicatas após a ordenação.',
+      'Conte duplicatas com `sort names.txt | uniq -c`.',
+      'Obtenha um ranking de frequência: `sort names.txt | uniq -c | sort -rn`.',
+      'Extraia uma coluna do CSV: `cut -d\',\' -f3 data.csv` (pega os preços).',
+      'Some uma coluna com awk: `awk -F\',\' \'{ sum += $3 } END { print sum }\' data.csv`.',
+      'Veja os dados brutos primeiro: `cat names.txt`, `cat data.csv`, `cat sales.txt`.',
+      'Transforme caracteres com `tr`: tente `echo \'hello\' | tr \'[:lower:]\' \'[:upper:]\'`.',
     ],
   },
 
   drills: [
     {
       id: 'data-drill-1',
-      prompt: 'Sort the file names.txt in alphabetical order.',
+      prompt: 'Ordene o arquivo names.txt em ordem alfabética.',
       difficulty: 'easy',
       check: (cmd) => /^sort\s+names\.txt$/.test(cmd.trim()),
       expectedOutput: 'Alice\nAlice\nBob\nBob\nBob\nCharlie\nDiana\nDiana\nEve\nEve',
