@@ -91,4 +91,65 @@ describe('gameStore', () => {
     expect(useGameStore.getState().currentStreak).toBe(3);
     expect(useGameStore.getState().freezeTokens).toBe(0);
   });
+
+  // Session persistence tests
+
+  it('starts with null/default session fields', () => {
+    const state = useGameStore.getState();
+    expect(state.currentModuleId).toBeNull();
+    expect(state.currentPhase).toBeNull();
+    expect(state.currentDrillIndex).toBe(0);
+    expect(state.currentBossStep).toBe(0);
+    expect(state.currentView).toBe('terminal');
+  });
+
+  it('setSession updates module, phase, drill index and boss step', () => {
+    useGameStore.getState().setSession('cli-basics', 'drill', 2, 0);
+    const state = useGameStore.getState();
+    expect(state.currentModuleId).toBe('cli-basics');
+    expect(state.currentPhase).toBe('drill');
+    expect(state.currentDrillIndex).toBe(2);
+    expect(state.currentBossStep).toBe(0);
+  });
+
+  it('setCurrentView updates the current view', () => {
+    useGameStore.getState().setCurrentView('map');
+    expect(useGameStore.getState().currentView).toBe('map');
+    useGameStore.getState().setCurrentView('achievements');
+    expect(useGameStore.getState().currentView).toBe('achievements');
+  });
+
+  it('clearSession resets session fields to defaults', () => {
+    useGameStore.getState().setSession('cli-basics', 'boss', 3, 1);
+    useGameStore.getState().setCurrentView('map');
+    useGameStore.getState().clearSession();
+    const state = useGameStore.getState();
+    expect(state.currentModuleId).toBeNull();
+    expect(state.currentPhase).toBeNull();
+    expect(state.currentDrillIndex).toBe(0);
+    expect(state.currentBossStep).toBe(0);
+    expect(state.currentView).toBe('terminal');
+  });
+
+  it('clearSession does not affect game progress', () => {
+    useGameStore.getState().addXP(100);
+    useGameStore.getState().completeModule('cli-basics');
+    useGameStore.getState().setSession('cli-basics', 'drill', 1, 0);
+    useGameStore.getState().clearSession();
+    const state = useGameStore.getState();
+    expect(state.totalXP).toBe(100);
+    expect(state.completedModules).toContain('cli-basics');
+  });
+
+  it('reset also clears session fields', () => {
+    useGameStore.getState().setSession('cli-basics', 'boss', 2, 1);
+    useGameStore.getState().setCurrentView('stats');
+    useGameStore.getState().reset();
+    const state = useGameStore.getState();
+    expect(state.currentModuleId).toBeNull();
+    expect(state.currentPhase).toBeNull();
+    expect(state.currentDrillIndex).toBe(0);
+    expect(state.currentBossStep).toBe(0);
+    expect(state.currentView).toBe('terminal');
+  });
 });

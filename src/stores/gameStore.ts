@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { GameState, DrillAttempt, Tier } from '../types';
+import type { GameState, DrillAttempt, Tier, ModulePhase } from '../types';
 import { getCurrentTier, getNextTier } from '../data/tiers';
 import { saveState, loadState, clearState } from '../utils/persistence';
 
@@ -17,6 +17,9 @@ interface GameActions {
   getCurrentTier: () => Tier;
   getNextTier: () => Tier | null;
   getXpMultiplier: () => number;
+  setSession: (moduleId: string, phase: ModulePhase, drillIndex: number, bossStep: number) => void;
+  setCurrentView: (view: string) => void;
+  clearSession: () => void;
   reset: () => void;
 }
 
@@ -33,6 +36,12 @@ const DEFAULT_STATE: GameState = {
   lastPlayDate: null,
   freezeTokens: 0,
   totalPlayTimeMs: 0,
+  // Session persistence
+  currentModuleId: null,
+  currentPhase: null,
+  currentDrillIndex: 0,
+  currentBossStep: 0,
+  currentView: 'terminal',
 };
 
 export const useGameStore = create<GameState & GameActions>()((set, get) => ({
@@ -142,6 +151,26 @@ export const useGameStore = create<GameState & GameActions>()((set, get) => ({
     return 1.0;
   },
 
+  setSession: (moduleId, phase, drillIndex, bossStep) =>
+    set({
+      currentModuleId: moduleId,
+      currentPhase: phase,
+      currentDrillIndex: drillIndex,
+      currentBossStep: bossStep,
+    }),
+
+  setCurrentView: (view) =>
+    set({ currentView: view }),
+
+  clearSession: () =>
+    set({
+      currentModuleId: null,
+      currentPhase: null,
+      currentDrillIndex: 0,
+      currentBossStep: 0,
+      currentView: 'terminal',
+    }),
+
   reset: () => {
     clearState();
     set(DEFAULT_STATE);
@@ -167,6 +196,9 @@ useGameStore.subscribe((state) => {
       getCurrentTier,
       getNextTier,
       getXpMultiplier,
+      setSession,
+      setCurrentView,
+      clearSession,
       reset,
       ...data
     } = state;
