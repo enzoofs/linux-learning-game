@@ -18,15 +18,34 @@ interface ModulePlayerProps {
 }
 
 export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
-  const [phase, setPhase] = useState<ModulePhase>('briefing');
-  const [currentDrillIndex, setCurrentDrillIndex] = useState(0);
-  const [currentBossStep, setCurrentBossStep] = useState(0);
+  const store = useGameStore();
+  const {
+    addXP, completeDrill, completeModule, completeBoss, trackSandboxCommand,
+    addFreezeToken, setSession, clearSession,
+  } = store;
+
+  const [phase, setPhase] = useState<ModulePhase>(() => {
+    const s = useGameStore.getState();
+    return s.currentModuleId === module.id && s.currentPhase ? s.currentPhase : 'briefing';
+  });
+  const [currentDrillIndex, setCurrentDrillIndex] = useState(() => {
+    const s = useGameStore.getState();
+    return s.currentModuleId === module.id ? s.currentDrillIndex : 0;
+  });
+  const [currentBossStep, setCurrentBossStep] = useState(() => {
+    const s = useGameStore.getState();
+    return s.currentModuleId === module.id ? s.currentBossStep : 0;
+  });
   const [drillStartTime, setDrillStartTime] = useState(0);
   const [drillAttempts, setDrillAttempts] = useState(0);
   const [usedHint, setUsedHint] = useState(false);
 
   const terminal = useTerminal();
-  const { addXP, completeDrill, completeModule, completeBoss, trackSandboxCommand, addFreezeToken } = useGameStore();
+
+  // Sync session state to store on every phase/drill/boss change
+  useEffect(() => {
+    setSession(module.id, phase, currentDrillIndex, currentBossStep);
+  }, [module.id, phase, currentDrillIndex, currentBossStep, setSession]);
 
   const currentDrill = module.drills[currentDrillIndex];
   const currentBoss = module.boss.steps[currentBossStep];
@@ -218,6 +237,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
         completeBoss(module.id);
         completeModule(module.id);
         addFreezeToken();
+        clearSession();
         terminal.addLine({ type: 'system', text: '' });
         terminal.addLine({ type: 'levelup', text: `BOSS DERROTADO: ${module.boss.title}! +${module.boss.xpReward} XP` });
         terminal.addLine({ type: 'success', text: 'Ganhou 1 Token de Proteção de Streak!' });
@@ -235,7 +255,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     }
 
     terminal.setInputValue('');
-  }, [terminal, currentBoss, currentBossStep, module, addXP, completeBoss, completeModule, addFreezeToken, onModuleComplete]);
+  }, [terminal, currentBoss, currentBossStep, module, addXP, completeBoss, completeModule, addFreezeToken, clearSession, onModuleComplete]);
 
   const handleSubmit = useCallback(() => {
     if (phase === 'sandbox') handleSandboxSubmit();

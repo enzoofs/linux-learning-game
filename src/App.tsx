@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Layout } from './components/Layout/Layout';
 import { ModulePlayer } from './components/ModulePlayer/ModulePlayer';
 import { SkillTree } from './components/SkillTree/SkillTree';
@@ -13,11 +13,32 @@ import type { Module } from './types';
 
 type View = 'terminal' | 'map' | 'journal' | 'achievements' | 'stats';
 
+const VALID_VIEWS: View[] = ['terminal', 'map', 'journal', 'achievements', 'stats'];
+
+function resolveInitialView(): View {
+  const saved = useGameStore.getState().currentView;
+  return VALID_VIEWS.includes(saved as View) ? (saved as View) : 'terminal';
+}
+
+function resolveInitialModule(): Module | null {
+  const savedId = useGameStore.getState().currentModuleId;
+  if (savedId) {
+    const mod = getModuleById(savedId);
+    if (mod) return mod;
+  }
+  return cliBasicsModule;
+}
+
 function App() {
-  const [view, setView] = useState<View>('terminal');
-  const [activeModule, setActiveModule] = useState<Module | null>(cliBasicsModule);
-  const { updateStreak, addPlayTime } = useGameStore();
+  const [view, setView] = useState<View>(resolveInitialView);
+  const [activeModule, setActiveModule] = useState<Module | null>(resolveInitialModule);
+  const { updateStreak, addPlayTime, setCurrentView } = useGameStore();
   const sessionStart = useRef(Date.now());
+
+  const handleSetView = useCallback((v: View) => {
+    setView(v);
+    setCurrentView(v);
+  }, [setCurrentView]);
 
   useAchievementDetection();
 
@@ -36,12 +57,12 @@ function App() {
   }, []);
 
   return (
-    <Layout currentView={view} onViewChange={setView}>
+    <Layout currentView={view} onViewChange={handleSetView}>
       {view === 'terminal' && activeModule && (
         <ModulePlayer
           key={activeModule.id}
           module={activeModule}
-          onModuleComplete={() => setView('map')}
+          onModuleComplete={() => handleSetView('map')}
         />
       )}
       {view === 'map' && (
@@ -49,7 +70,7 @@ function App() {
           const mod = getModuleById(id);
           if (mod) {
             setActiveModule(mod);
-            setView('terminal');
+            handleSetView('terminal');
           }
         }} />
       )}
