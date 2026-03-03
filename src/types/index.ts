@@ -1,3 +1,5 @@
+import type { FSNode } from '../utils/virtualFS';
+
 // === Tiers & Progression ===
 
 export type TierName = 'Recruit' | 'Operator' | 'Specialist' | 'Commander';
@@ -95,6 +97,7 @@ export interface Module {
   drills: Drill[];
   boss: BossChallenge;
   achievements: string[];
+  initialFS?: FSNode;  // Optional custom filesystem for this module
 }
 
 // === Skill Tree ===
@@ -176,5 +179,7 @@ export interface GameState {
   currentPhase: ModulePhase | null;
   currentDrillIndex: number;
   currentBossStep: number;
-  currentView: string;
+  currentView: AppView;
 }
+
+export type AppView = 'terminal' | 'map' | 'journal' | 'achievements' | 'stats';
