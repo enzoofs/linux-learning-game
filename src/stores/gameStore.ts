@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { GameState, DrillAttempt, Tier } from '../types';
 import { getCurrentTier, getNextTier } from '../data/tiers';
-import { saveState, clearState } from '../utils/persistence';
+import { saveState, loadState, clearState } from '../utils/persistence';
 
 interface GameActions {
   addXP: (amount: number) => void;
@@ -36,7 +36,7 @@ const DEFAULT_STATE: GameState = {
 };
 
 export const useGameStore = create<GameState & GameActions>()((set, get) => ({
-  ...DEFAULT_STATE,
+  ...loadState(DEFAULT_STATE),
 
   addXP: (amount) =>
     set((s) => {
