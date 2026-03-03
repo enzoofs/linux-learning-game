@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { analyzeCommand, FeedbackResult } from '../commandParser';
-import { DrillFeedbackRule } from '../../types';
+import { analyzeCommand } from '../commandParser';
+import type { DrillFeedbackRule } from '../../types';
 
 describe('analyzeCommand', () => {
   const feedbackRules: DrillFeedbackRule[] = [

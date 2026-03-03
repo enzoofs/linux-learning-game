@@ -1,4 +1,4 @@
-import { Module } from '../../types';
+import type { Module } from '../../types';
 import { cliBasicsModule } from './cli-basics';
 import { pipesStreamsModule } from './pipes-streams';
 import { filesNavigationModule } from './files-navigation';
