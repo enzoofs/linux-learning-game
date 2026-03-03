@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Layout } from './components/Layout/Layout';
 import { ModulePlayer } from './components/ModulePlayer/ModulePlayer';
-import { SkillTree } from './components/SkillTree/SkillTree';
+import { MissionMap } from './components/MissionMap/MissionMap';
 import { Achievements } from './components/Achievements/Achievements';
 import { Stats } from './components/Stats/Stats';
 import { Journal } from './components/Journal/Journal';
@@ -66,7 +66,7 @@ function App() {
           />
         )}
         {view === 'map' && (
-          <SkillTree onSelectModule={(id) => {
+          <MissionMap onSelectModule={(id) => {
             const mod = getModuleById(id);
             if (mod) {
               setActiveModule(mod);
