@@ -309,10 +309,6 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       const nextStep = currentBossStep + 1;
       if (nextStep < module.boss.steps.length) {
         setCurrentBossStep(nextStep);
-        setTimeout(() => {
-          terminal.addLine({ type: 'system', text: '' });
-          terminal.addLine({ type: 'brief', text: module.boss.steps[nextStep].prompt });
-        }, 1000);
       } else {
         // Boss complete!
         addXP(module.boss.xpReward);
