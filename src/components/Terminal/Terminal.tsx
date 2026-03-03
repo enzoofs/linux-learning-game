@@ -34,7 +34,7 @@ export function Terminal({
   inputRef,
   endRef,
   prompt = 'enzo@linux ~ $',
-  placeholder = "type a command... (try 'help')",
+  placeholder = "digite um comando... (tente 'help')",
   disabled = false,
 }: TerminalProps) {
   const [shakeInput, setShakeInput] = useState(false);

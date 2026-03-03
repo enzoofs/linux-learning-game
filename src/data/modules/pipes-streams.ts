@@ -2,39 +2,39 @@ import type { Module } from '../../types';
 
 export const pipesStreamsModule: Module = {
   id: 'pipes-streams',
-  title: 'Pipes & Streams',
-  description: 'Connect commands together and redirect data flow like a pro.',
+  title: 'Pipes e Redirecionamento',
+  description: 'Conecte comandos entre si e redirecione o fluxo de dados como um profissional.',
   tier: 'Operator',
   prerequisites: ['cli-basics'],
   isSideQuest: false,
 
   briefing: {
     concept:
-      `In Linux, every command reads input and produces output. The magic happens when you connect them together. This module covers 3 big ideas:\n\n` +
-      `**1. Pipes (\`|\`)** — Send the output of one command as input to the next.\n` +
-      `Every command has a standard output (stdout). The pipe takes that output and feeds it as standard input (stdin) to the next command. You can chain as many as you want:\n` +
+      `No Linux, todo comando lê entrada e produz saída. A mágica acontece quando você conecta eles. Este módulo cobre 3 grandes ideias:\n\n` +
+      `**1. Pipes (\`|\`)** — Envia a saída de um comando como entrada para o próximo.\n` +
+      `Todo comando tem uma saída padrão (stdout). O pipe pega essa saída e alimenta como entrada padrão (stdin) para o próximo comando. Você pode encadear quantos quiser:\n` +
       `\`command1 | command2 | command3\`\n\n` +
-      `**2. Redirect Overwrite (\`>\`)** — Send output to a file instead of the screen. WARNING: this destroys the file's previous contents!\n\n` +
-      `**3. Redirect Append (\`>>\`)** — Add output to the end of a file without erasing what's already there.\n\n` +
-      `Key commands for working with pipes and streams:\n` +
-      `• **echo** — Print text to the screen (or into a pipe/file).\n` +
-      `• **cat** — Read a file and print it to stdout. Perfect pipe starter.\n` +
-      `• **wc** — Count lines (\`-l\`), words (\`-w\`), or characters (\`-c\`).\n` +
-      `• **grep** — Filter lines that match a pattern.\n` +
-      `• **head / tail** — Show the first or last N lines of output.\n` +
-      `• **sort** — Sort lines alphabetically or numerically.`,
+      `**2. Redirect Sobrescrever (\`>\`)** — Envia a saída para um arquivo em vez da tela. CUIDADO: isso destrói o conteúdo anterior do arquivo!\n\n` +
+      `**3. Redirect Append (\`>>\`)** — Adiciona a saída ao final de um arquivo sem apagar o que já está lá.\n\n` +
+      `Comandos-chave para trabalhar com pipes e redirecionamento:\n` +
+      `• **echo** — Imprime texto na tela (ou em um pipe/arquivo).\n` +
+      `• **cat** — Lê um arquivo e imprime no stdout. Ótimo para iniciar um pipe.\n` +
+      `• **wc** — Conta linhas (\`-l\`), palavras (\`-w\`) ou caracteres (\`-c\`).\n` +
+      `• **grep** — Filtra linhas que correspondem a um padrão.\n` +
+      `• **head / tail** — Mostra as primeiras ou últimas N linhas da saída.\n` +
+      `• **sort** — Ordena linhas alfabeticamente ou numericamente.`,
     analogy:
-      'Pipes are like water pipes — data flows from one command into the next. Each command is a filter or transformer along the pipeline. Redirects (\`>\` and \`>>\`) are like faucets that send the stream to a file instead of the screen. \`>\` replaces the bucket with fresh water, while \`>>\` pours more water into the same bucket.',
+      'Pipes são como canos de água — os dados fluem de um comando para o próximo. Cada comando é um filtro ou transformador ao longo do pipeline. Redirects (\`>\` e \`>>\`) são como torneiras que enviam o fluxo para um arquivo em vez da tela. \`>\` troca a água do balde, enquanto \`>>\` despeja mais água no mesmo balde.',
     syntax:
       'command1 | command2        # pipe output of command1 into command2\ncommand > file             # write output to file (overwrite)\ncommand >> file            # append output to file\necho "text"                # print text to stdout\ncat file                   # read file to stdout\nwc [-l|-w|-c] [file]       # count lines/words/chars\ngrep "pattern" [file]      # filter lines matching pattern\nhead -N file               # show first N lines\ntail -N file               # show last N lines',
     examples: [
-      { command: 'echo "Hello Linux"', output: 'Hello Linux', explanation: 'Prints the text to the terminal. The simplest way to produce output.' },
-      { command: 'echo "Hello Linux" > hello.txt', output: '', explanation: 'Writes "Hello Linux" into hello.txt. If the file exists, it is overwritten.' },
-      { command: 'cat hello.txt', output: 'Hello Linux', explanation: 'Reads the file and prints its contents to the screen.' },
-      { command: 'ls | wc -l', output: '8', explanation: 'Lists files, then counts how many lines — giving you a file count.' },
-      { command: 'cat /etc/passwd | grep bash', output: 'root:x:0:0:root:/root:/bin/bash\nenzo:x:1000:...:/bin/bash', explanation: 'Reads the passwd file and filters only lines containing "bash".' },
-      { command: 'echo "log entry" >> server.log', output: '', explanation: 'Appends the text to server.log without erasing existing content.' },
-      { command: 'cat access.log | grep ERROR | wc -l', output: '42', explanation: 'Chains 3 commands: read the log, filter errors, count them. This is the power of pipes.' },
+      { command: 'echo "Hello Linux"', output: 'Hello Linux', explanation: 'Imprime o texto no terminal. A forma mais simples de produzir saída.' },
+      { command: 'echo "Hello Linux" > hello.txt', output: '', explanation: 'Escreve "Hello Linux" no hello.txt. Se o arquivo existir, ele é sobrescrito.' },
+      { command: 'cat hello.txt', output: 'Hello Linux', explanation: 'Lê o arquivo e imprime seu conteúdo na tela.' },
+      { command: 'ls | wc -l', output: '8', explanation: 'Lista arquivos e depois conta quantas linhas — te dando a contagem de arquivos.' },
+      { command: 'cat /etc/passwd | grep bash', output: 'root:x:0:0:root:/root:/bin/bash\nenzo:x:1000:...:/bin/bash', explanation: 'Lê o arquivo passwd e filtra apenas linhas contendo "bash".' },
+      { command: 'echo "log entry" >> server.log', output: '', explanation: 'Adiciona o texto ao server.log sem apagar o conteúdo existente.' },
+      { command: 'cat access.log | grep ERROR | wc -l', output: '42', explanation: 'Encadeia 3 comandos: lê o log, filtra erros, conta. Esse é o poder dos pipes.' },
     ],
   },
 
@@ -61,139 +61,139 @@ export const pipesStreamsModule: Module = {
       { pattern: /^sort\s+\S+/, output: '(sorted output)', description: 'Sort a file' },
     ],
     contextHints: [
-      'Try `echo "Hello Linux"` to print text to the screen.',
-      'Use `echo "text" > file.txt` to write text to a file.',
-      'Use `cat file.txt` to read a file.',
-      'Chain commands with `|` — try `ls | wc -l` to count files.',
-      'Use `grep` to filter: `cat access.log | grep ERROR`',
-      'Count things with `wc`: `-l` for lines, `-w` for words, `-c` for characters.',
-      'Try chaining 3 commands: `cat access.log | grep ERROR | wc -l`',
-      'Save output to a file: `grep ERROR access.log > errors.txt`',
+      'Tente `echo "Hello Linux"` para imprimir texto na tela.',
+      'Use `echo "text" > file.txt` para escrever texto em um arquivo.',
+      'Use `cat file.txt` para ler um arquivo.',
+      'Encadeie comandos com `|` — tente `ls | wc -l` para contar arquivos.',
+      'Use `grep` para filtrar: `cat access.log | grep ERROR`',
+      'Conte coisas com `wc`: `-l` para linhas, `-w` para palavras, `-c` para caracteres.',
+      'Tente encadear 3 comandos: `cat access.log | grep ERROR | wc -l`',
+      'Salve a saída em um arquivo: `grep ERROR access.log > errors.txt`',
     ],
   },
 
   drills: [
     {
       id: 'pipes-drill-1',
-      prompt: 'Count how many files and folders are in the current directory. Use a pipe to connect two commands.',
+      prompt: 'Conte quantos arquivos e pastas existem no diretório atual. Use um pipe para conectar dois comandos.',
       difficulty: 'easy',
       check: (cmd) => /^ls\s*\|\s*wc\s+-l$/.test(cmd.trim()),
       expectedOutput: '8',
       hints: [
-        'You need two commands: one to list files, one to count lines.',
-        'Pipe `ls` into `wc -l` to count the output lines.',
+        'Você precisa de dois comandos: um para listar arquivos, outro para contar linhas.',
+        'Passe `ls` por pipe para `wc -l` para contar as linhas da saída.',
       ],
       feedbackRules: [
-        { pattern: /^ls$/, message: 'That lists files, but you need to count them. Pipe the output to `wc -l`.' },
-        { pattern: /^wc\s+-l$/, message: '`wc -l` counts lines, but it needs input! Pipe `ls` into it: `ls | wc -l`.' },
-        { pattern: /^ls\s*\|\s*wc$/, message: 'Almost! `wc` alone shows lines, words, and chars. Use `wc -l` to get just the line count.' },
-        { pattern: /^ls\s+-l\s*\|\s*wc\s+-l/, message: 'That works but includes a "total" line. For this drill, just use `ls | wc -l`.' },
+        { pattern: /^ls$/, message: 'Isso lista os arquivos, mas você precisa contá-los. Passe a saída por pipe para `wc -l`.' },
+        { pattern: /^wc\s+-l$/, message: '`wc -l` conta linhas, mas precisa de entrada! Passe `ls` por pipe: `ls | wc -l`.' },
+        { pattern: /^ls\s*\|\s*wc$/, message: 'Quase! `wc` sozinho mostra linhas, palavras e caracteres. Use `wc -l` para pegar só a contagem de linhas.' },
+        { pattern: /^ls\s+-l\s*\|\s*wc\s+-l/, message: 'Funciona, mas inclui a linha "total". Para este drill, use apenas `ls | wc -l`.' },
       ],
       xp: 50,
     },
     {
       id: 'pipes-drill-2',
-      prompt: 'Save the text "Hello Linux" to a file called hello.txt using echo and output redirection.',
+      prompt: 'Salve o texto "Hello Linux" em um arquivo chamado hello.txt usando echo e redirecionamento de saída.',
       difficulty: 'easy',
       check: (cmd) => /^echo\s+['"]Hello Linux['"]\s*>\s*hello\.txt$/.test(cmd.trim()),
       expectedOutput: '',
       hints: [
-        'Use `echo` to produce the text and `>` to send it to a file.',
-        'The command is: `echo \'Hello Linux\' > hello.txt`',
+        'Use `echo` para produzir o texto e `>` para enviá-lo a um arquivo.',
+        'O comando é: `echo \'Hello Linux\' > hello.txt`',
       ],
       feedbackRules: [
-        { pattern: /^echo\s+Hello Linux$/, message: 'That prints to the screen. Use `>` to redirect into a file: `echo \'Hello Linux\' > hello.txt`.' },
-        { pattern: /^echo\s+['"]Hello Linux['"]\s*$/, message: 'Good echo! Now redirect it to hello.txt with `>`.' },
-        { pattern: /^echo\s+['"]Hello Linux['"]\s*>>\s*hello\.txt$/, message: '`>>` appends. For this drill, use `>` to write (overwrite) the file.' },
-        { pattern: /^cat\s+.*>\s*hello\.txt$/, message: 'We want to write new text, not copy a file. Use `echo` instead of `cat`.' },
-        { pattern: /^echo\s+['"]hello linux['"]\s*>/i, message: 'Watch the capitalization! It should be "Hello Linux" with capital H and L.' },
+        { pattern: /^echo\s+Hello Linux$/, message: 'Isso imprime na tela. Use `>` para redirecionar para um arquivo: `echo \'Hello Linux\' > hello.txt`.' },
+        { pattern: /^echo\s+['"]Hello Linux['"]\s*$/, message: 'Bom echo! Agora redirecione para hello.txt com `>`.' },
+        { pattern: /^echo\s+['"]Hello Linux['"]\s*>>\s*hello\.txt$/, message: '`>>` faz append. Para este drill, use `>` para escrever (sobrescrever) o arquivo.' },
+        { pattern: /^cat\s+.*>\s*hello\.txt$/, message: 'Queremos escrever texto novo, não copiar um arquivo. Use `echo` em vez de `cat`.' },
+        { pattern: /^echo\s+['"]hello linux['"]\s*>/i, message: 'Atenção à capitalização! Deve ser "Hello Linux" com H e L maiúsculos.' },
       ],
       xp: 50,
     },
     {
       id: 'pipes-drill-3',
-      prompt: 'Read the file hello.txt and count how many words it contains. Use a pipe to connect the commands.',
+      prompt: 'Leia o arquivo hello.txt e conte quantas palavras ele contém. Use um pipe para conectar os comandos.',
       difficulty: 'medium',
       check: (cmd) => /^cat\s+hello\.txt\s*\|\s*wc\s+-w$/.test(cmd.trim()),
       expectedOutput: '2',
       hints: [
-        'You need `cat` to read the file, then pipe to a counting command.',
-        'The flag for word count is `-w`. Try `cat hello.txt | wc -w`.',
+        'Você precisa do `cat` para ler o arquivo e depois pipe para um comando de contagem.',
+        'A flag para contar palavras é `-w`. Tente `cat hello.txt | wc -w`.',
       ],
       feedbackRules: [
-        { pattern: /^cat\s+hello\.txt$/, message: 'That reads the file but doesn\'t count. Pipe it to `wc -w` for word count.' },
-        { pattern: /^wc\s+-w\s+hello\.txt$/, message: 'That works in real Linux! But this drill asks you to practice pipes. Use `cat hello.txt | wc -w`.' },
-        { pattern: /^cat\s+hello\.txt\s*\|\s*wc\s+-l$/, message: 'Close! `-l` counts lines. You want `-w` for word count.' },
-        { pattern: /^cat\s+hello\.txt\s*\|\s*wc\s+-c$/, message: '`-c` counts characters. You want `-w` for word count.' },
-        { pattern: /^cat\s+hello\.txt\s*\|\s*wc$/, message: 'Almost! Add `-w` to get just the word count: `cat hello.txt | wc -w`.' },
+        { pattern: /^cat\s+hello\.txt$/, message: 'Isso lê o arquivo mas não conta. Passe por pipe para `wc -w` para contar palavras.' },
+        { pattern: /^wc\s+-w\s+hello\.txt$/, message: 'Isso funciona no Linux real! Mas este drill pede para praticar pipes. Use `cat hello.txt | wc -w`.' },
+        { pattern: /^cat\s+hello\.txt\s*\|\s*wc\s+-l$/, message: 'Perto! `-l` conta linhas. Você quer `-w` para contagem de palavras.' },
+        { pattern: /^cat\s+hello\.txt\s*\|\s*wc\s+-c$/, message: '`-c` conta caracteres. Você quer `-w` para contagem de palavras.' },
+        { pattern: /^cat\s+hello\.txt\s*\|\s*wc$/, message: 'Quase! Adicione `-w` para pegar só a contagem de palavras: `cat hello.txt | wc -w`.' },
       ],
       xp: 75,
     },
     {
       id: 'pipes-drill-4',
-      prompt: 'Chain 3 commands together: read /etc/passwd, filter lines that contain "bash", and count how many there are.',
+      prompt: 'Encadeie 3 comandos: leia /etc/passwd, filtre as linhas que contêm "bash" e conte quantas são.',
       difficulty: 'hard',
       check: (cmd) => /^cat\s+\/etc\/passwd\s*\|\s*grep\s+['"]?bash['"]?\s*\|\s*wc\s+-l$/.test(cmd.trim()),
       expectedOutput: '2',
       hints: [
-        'You need 3 commands connected by 2 pipes: read | filter | count.',
-        'Start with `cat /etc/passwd`, pipe to `grep bash`, pipe to `wc -l`.',
+        'Você precisa de 3 comandos conectados por 2 pipes: ler | filtrar | contar.',
+        'Comece com `cat /etc/passwd`, pipe para `grep bash`, pipe para `wc -l`.',
       ],
       feedbackRules: [
-        { pattern: /^cat\s+\/etc\/passwd$/, message: 'Good start! Now pipe that to `grep bash` to filter, then to `wc -l` to count.' },
-        { pattern: /^cat\s+\/etc\/passwd\s*\|\s*grep\s+['"]?bash['"]?$/, message: 'Two commands chained! Now add one more pipe to `wc -l` to count the matching lines.' },
-        { pattern: /^grep\s+['"]?bash['"]?\s+\/etc\/passwd\s*\|\s*wc\s+-l$/, message: 'That works in practice, but this drill asks you to chain 3 commands starting with `cat`.' },
-        { pattern: /^cat\s+\/etc\/passwd\s*\|\s*wc\s+-l$/, message: 'You\'re counting ALL lines. Insert `grep bash` between cat and wc to filter first.' },
-        { pattern: /^cat\s+\/etc\/passwd\s*\|\s*grep\s+['"]?bash['"]?\s*\|\s*wc\s+-w$/, message: 'Almost perfect! Use `-l` (lines) instead of `-w` (words) to count matching lines.' },
+        { pattern: /^cat\s+\/etc\/passwd$/, message: 'Bom começo! Agora passe por pipe para `grep bash` para filtrar, depois para `wc -l` para contar.' },
+        { pattern: /^cat\s+\/etc\/passwd\s*\|\s*grep\s+['"]?bash['"]?$/, message: 'Dois comandos encadeados! Agora adicione mais um pipe para `wc -l` para contar as linhas correspondentes.' },
+        { pattern: /^grep\s+['"]?bash['"]?\s+\/etc\/passwd\s*\|\s*wc\s+-l$/, message: 'Funciona na prática, mas este drill pede para encadear 3 comandos começando com `cat`.' },
+        { pattern: /^cat\s+\/etc\/passwd\s*\|\s*wc\s+-l$/, message: 'Você está contando TODAS as linhas. Insira `grep bash` entre cat e wc para filtrar primeiro.' },
+        { pattern: /^cat\s+\/etc\/passwd\s*\|\s*grep\s+['"]?bash['"]?\s*\|\s*wc\s+-w$/, message: 'Quase perfeito! Use `-l` (linhas) em vez de `-w` (palavras) para contar linhas correspondentes.' },
       ],
       xp: 125,
     },
   ],
 
   boss: {
-    title: 'The Log Analyzer',
-    scenario: 'Your web server has been acting up. Users are reporting errors, and your boss wants a report ASAP. Analyze the access log to find the problem and save the evidence.',
+    title: 'O Analisador de Logs',
+    scenario: 'Seu servidor web está dando problema. Usuários estão reportando erros e seu chefe quer um relatório ASAP. Analise o access log para encontrar o problema e salve as evidências.',
     steps: [
       {
         id: 'boss-pipes-1',
-        prompt: '> The access log is in the current directory. Start by viewing the last 10 lines to get a quick overview of recent activity.',
+        prompt: '> O access log está no diretório atual. Comece vendo as últimas 10 linhas para ter uma visão rápida da atividade recente.',
         check: (cmd) => /^tail\s+-10\s+access\.log$/.test(cmd.trim()),
         expectedOutput: '2024-03-01 10:00:01 INFO  Request GET /index.html 200\n2024-03-01 10:00:02 ERROR Request GET /api/users 500\n2024-03-01 10:00:03 INFO  Request POST /api/login 200\n2024-03-01 10:00:04 WARN  Request GET /old-page 301\n2024-03-01 10:00:05 ERROR Request GET /api/data 503\n2024-03-01 10:00:06 INFO  Request GET /about 200\n2024-03-01 10:00:07 ERROR Request POST /api/submit 500\n2024-03-01 10:00:08 INFO  Request GET /style.css 200\n2024-03-01 10:00:09 ERROR Request GET /api/config 502\n2024-03-01 10:00:10 INFO  Request GET /favicon.ico 200',
-        hints: ['Use `tail` with `-10` to show the last 10 lines of a file.'],
+        hints: ['Use `tail` com `-10` para mostrar as últimas 10 linhas de um arquivo.'],
         feedbackRules: [
-          { pattern: /^cat\s+access\.log$/, message: 'That shows the whole file. Use `tail -10 access.log` to see just the last 10 lines.' },
-          { pattern: /^head/, message: '`head` shows the beginning. You want `tail` to see the most recent entries.' },
-          { pattern: /^tail\s+access\.log$/, message: 'Good idea! But specify the count: `tail -10 access.log`.' },
+          { pattern: /^cat\s+access\.log$/, message: 'Isso mostra o arquivo inteiro. Use `tail -10 access.log` para ver só as últimas 10 linhas.' },
+          { pattern: /^head/, message: '`head` mostra o começo. Você quer `tail` para ver as entradas mais recentes.' },
+          { pattern: /^tail\s+access\.log$/, message: 'Boa ideia! Mas especifique a quantidade: `tail -10 access.log`.' },
         ],
       },
       {
         id: 'boss-pipes-2',
-        prompt: '> You can see ERROR entries mixed in. Count the total number of ERROR lines in the log using grep and wc.',
+        prompt: '> Dá pra ver entradas ERROR misturadas. Conte o total de linhas ERROR no log usando grep e wc.',
         check: (cmd) => /^grep\s+['"]?ERROR['"]?\s+access\.log\s*\|\s*wc\s+-l$/.test(cmd.trim()),
         expectedOutput: '4',
         hints: [
-          'Use `grep` to find ERROR lines, then pipe to `wc -l` to count them.',
-          'Try: `grep ERROR access.log | wc -l`',
+          'Use `grep` para encontrar linhas ERROR, depois pipe para `wc -l` para contá-las.',
+          'Tente: `grep ERROR access.log | wc -l`',
         ],
         feedbackRules: [
-          { pattern: /^grep\s+['"]?ERROR['"]?\s+access\.log$/, message: 'That shows the errors, but your boss wants a number. Pipe to `wc -l` to count them.' },
-          { pattern: /^cat\s+access\.log\s*\|\s*grep\s+['"]?ERROR['"]?\s*\|\s*wc\s+-l$/, message: 'That works, but you can simplify: `grep` can read files directly. Try `grep ERROR access.log | wc -l`.' },
-          { pattern: /^wc\s+-l\s+access\.log$/, message: 'That counts ALL lines. Filter for ERROR first with `grep`.' },
+          { pattern: /^grep\s+['"]?ERROR['"]?\s+access\.log$/, message: 'Isso mostra os erros, mas seu chefe quer um número. Passe por pipe para `wc -l` para contar.' },
+          { pattern: /^cat\s+access\.log\s*\|\s*grep\s+['"]?ERROR['"]?\s*\|\s*wc\s+-l$/, message: 'Funciona, mas dá pra simplificar: `grep` lê arquivos diretamente. Tente `grep ERROR access.log | wc -l`.' },
+          { pattern: /^wc\s+-l\s+access\.log$/, message: 'Isso conta TODAS as linhas. Filtre por ERROR primeiro com `grep`.' },
         ],
       },
       {
         id: 'boss-pipes-3',
-        prompt: '> 4 errors! Save all ERROR lines to a file called errors.txt so you can attach it to your incident report.',
+        prompt: '> 4 erros! Salve todas as linhas ERROR em um arquivo chamado errors.txt para anexar ao seu relatório de incidente.',
         check: (cmd) => /^grep\s+['"]?ERROR['"]?\s+access\.log\s*>\s*errors\.txt$/.test(cmd.trim()),
         expectedOutput: '',
         hints: [
-          'Use `grep` to find the lines and `>` to redirect them to a file.',
-          'Try: `grep ERROR access.log > errors.txt`',
+          'Use `grep` para encontrar as linhas e `>` para redirecioná-las para um arquivo.',
+          'Tente: `grep ERROR access.log > errors.txt`',
         ],
         feedbackRules: [
-          { pattern: /^grep\s+['"]?ERROR['"]?\s+access\.log\s*>>\s*errors\.txt$/, message: '`>>` appends. Since this is a new file, use `>` to write: `grep ERROR access.log > errors.txt`.' },
-          { pattern: /^cat\s+access\.log\s*\|\s*grep\s+['"]?ERROR['"]?\s*>\s*errors\.txt$/, message: 'That works! But you can simplify — `grep` reads files directly: `grep ERROR access.log > errors.txt`.' },
-          { pattern: /^grep\s+['"]?ERROR['"]?\s+access\.log$/, message: 'That prints errors to screen. Redirect to a file with `>`: `grep ERROR access.log > errors.txt`.' },
+          { pattern: /^grep\s+['"]?ERROR['"]?\s+access\.log\s*>>\s*errors\.txt$/, message: '`>>` faz append. Como é um arquivo novo, use `>` para escrever: `grep ERROR access.log > errors.txt`.' },
+          { pattern: /^cat\s+access\.log\s*\|\s*grep\s+['"]?ERROR['"]?\s*>\s*errors\.txt$/, message: 'Funciona! Mas dá pra simplificar — `grep` lê arquivos diretamente: `grep ERROR access.log > errors.txt`.' },
+          { pattern: /^grep\s+['"]?ERROR['"]?\s+access\.log$/, message: 'Isso imprime os erros na tela. Redirecione para um arquivo com `>`: `grep ERROR access.log > errors.txt`.' },
         ],
       },
     ],

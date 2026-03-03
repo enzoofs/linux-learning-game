@@ -3,14 +3,14 @@ import { ACHIEVEMENTS } from '../../data/achievements';
 import type { AchievementCategory } from '../../types';
 
 const CATEGORY_LABELS: Record<AchievementCategory, string> = {
-  mastery: '🏅 Mastery',
-  speed: '⚡ Speed',
-  exploration: '🔍 Exploration',
-  persistence: '💪 Persistence',
-  perfection: '🎯 Perfection',
-  secret: '🥚 Secret',
+  mastery: '🏅 Maestria',
+  speed: '⚡ Velocidade',
+  exploration: '🔍 Exploração',
+  persistence: '💪 Persistência',
+  perfection: '🎯 Perfeição',
+  secret: '🥚 Secreto',
   streak: '🔥 Streak',
-  completionist: '📦 Completionist',
+  completionist: '📦 Completista',
 };
 
 export function Achievements() {
@@ -19,9 +19,9 @@ export function Achievements() {
 
   return (
     <div className="p-6 max-h-[70vh] overflow-y-auto">
-      <div className="text-sm text-slate-500 mb-1 font-semibold tracking-wider">ACHIEVEMENTS</div>
+      <div className="text-sm text-slate-500 mb-1 font-semibold tracking-wider">CONQUISTAS</div>
       <div className="text-xs text-slate-600 mb-6">
-        {unlockedAchievements.length} / {ACHIEVEMENTS.length} unlocked
+        {unlockedAchievements.length} / {ACHIEVEMENTS.length} desbloqueadas
       </div>
 
       {categories.map((cat) => {

@@ -2,38 +2,38 @@ import type { Module } from '../../types';
 
 export const processMgmtModule: Module = {
   id: 'process-mgmt',
-  title: 'Process Management',
-  description: 'Monitor, control, and manage running processes like a system administrator.',
+  title: 'Gerenciamento de Processos',
+  description: 'Monitore, controle e gerencie processos em execução como um administrador de sistemas.',
   tier: 'Operator',
   prerequisites: ['cli-basics'],
   isSideQuest: false,
 
   briefing: {
     concept:
-      `Every program you run on Linux becomes a **process** — an active instance with its own ID (PID), memory, and CPU usage. Understanding processes is essential for troubleshooting, performance tuning, and system administration.\n\n` +
-      `**Viewing processes:**\n` +
-      `• **ps** — Snapshot of your current shell's processes. Quick and simple.\n` +
-      `• **ps aux** — Full system view: every process, every user, with CPU and memory usage.\n` +
-      `• **top** — Real-time, live-updating dashboard of all processes sorted by resource usage.\n` +
-      `• **pstree** — Shows processes as a tree, revealing parent-child relationships.\n\n` +
-      `**Controlling processes:**\n` +
-      `• **kill PID** — Sends the TERM signal to a process, politely asking it to stop.\n` +
-      `• **kill -9 PID** — Sends the KILL signal, forcefully terminating the process. Use as a last resort.\n` +
-      `• **Ctrl+Z** — Suspend (pause) a running foreground process.\n` +
-      `• **bg** — Resume a suspended process in the background.\n` +
-      `• **fg** — Bring a background process back to the foreground.\n` +
-      `• **jobs** — List all background and suspended jobs in the current shell.`,
+      `Todo programa que você executa no Linux se torna um **processo** — uma instância ativa com seu próprio ID (PID), memória e uso de CPU. Entender processos é essencial para troubleshooting, ajuste de performance e administração de sistemas.\n\n` +
+      `**Visualizando processos:**\n` +
+      `• **ps** — Snapshot dos processos do seu shell atual. Rápido e simples.\n` +
+      `• **ps aux** — Visão completa do sistema: cada processo, cada usuário, com uso de CPU e memória.\n` +
+      `• **top** — Dashboard em tempo real, atualizado ao vivo, de todos os processos ordenados por uso de recursos.\n` +
+      `• **pstree** — Mostra processos como uma árvore, revelando relações pai-filho.\n\n` +
+      `**Controlando processos:**\n` +
+      `• **kill PID** — Envia o sinal TERM para um processo, pedindo educadamente para parar.\n` +
+      `• **kill -9 PID** — Envia o sinal KILL, terminando o processo à força. Use como último recurso.\n` +
+      `• **Ctrl+Z** — Suspende (pausa) um processo em foreground.\n` +
+      `• **bg** — Retoma um processo suspenso em background.\n` +
+      `• **fg** — Traz um processo em background de volta para o foreground.\n` +
+      `• **jobs** — Lista todos os jobs em background e suspensos no shell atual.`,
     analogy:
-      'Processes are like workers in a factory. `ps` lets you see who\'s working, `kill` sends them home, and `top` is the factory floor manager watching everyone in real-time. `jobs` is your personal team roster, while `bg` and `fg` move workers between the back office and the front desk.',
+      'Processos são como trabalhadores em uma fábrica. `ps` mostra quem está trabalhando, `kill` manda embora, e `top` é o gerente de chão de fábrica observando todos em tempo real. `jobs` é a lista da sua equipe, enquanto `bg` e `fg` movem trabalhadores entre o escritório dos fundos e a recepção.',
     syntax:
       'ps                          # show your shell\'s processes\nps aux                       # show ALL processes with details\ntop                          # live process monitor (q to quit)\npstree                       # show process tree\nkill PID                     # send TERM signal (graceful stop)\nkill -9 PID                  # send KILL signal (force stop)\njobs                         # list background/suspended jobs\nbg [%job]                    # resume job in background\nfg [%job]                    # bring job to foreground',
     examples: [
-      { command: 'ps', output: '  PID TTY          TIME CMD\n 1234 pts/0    00:00:00 bash\n 5678 pts/0    00:00:00 ps', explanation: 'Shows processes in your current terminal session. You always see at least your shell (bash) and the ps command itself.' },
-      { command: 'ps aux', output: 'USER       PID %CPU %MEM    VSZ   RSS TTY  STAT START TIME COMMAND\nroot         1  0.0  0.1 169316 11892 ?   Ss   09:00 0:03 /sbin/init\nenzo      1234  0.0  0.0  21472  5204 pts/0 Ss 10:00 0:00 bash\nenzo      4523 99.0  5.2 312456 42000 ?    R  10:15 5:42 python train.py\n...', explanation: 'Shows ALL system processes. Note: `a` = all users, `u` = user-oriented format, `x` = include processes without a terminal.' },
-      { command: 'kill 4523', output: '', explanation: 'Sends SIGTERM to PID 4523. The process gets a chance to clean up and exit gracefully.' },
-      { command: 'kill -9 4523', output: '', explanation: 'Sends SIGKILL — instant death. The process cannot catch or ignore this signal. Use only if regular kill fails.' },
-      { command: 'jobs', output: '[1]+  Stopped                 vim server.conf\n[2]-  Running                 python backup.py &', explanation: 'Lists jobs in your shell. Job 1 is stopped (Ctrl+Z\'d), Job 2 is running in the background.' },
-      { command: 'fg %1', output: '(vim resumes in foreground)', explanation: 'Brings job 1 (vim) back to the foreground so you can interact with it.' },
+      { command: 'ps', output: '  PID TTY          TIME CMD\n 1234 pts/0    00:00:00 bash\n 5678 pts/0    00:00:00 ps', explanation: 'Mostra processos na sua sessão de terminal atual. Você sempre vê pelo menos o shell (bash) e o próprio comando ps.' },
+      { command: 'ps aux', output: 'USER       PID %CPU %MEM    VSZ   RSS TTY  STAT START TIME COMMAND\nroot         1  0.0  0.1 169316 11892 ?   Ss   09:00 0:03 /sbin/init\nenzo      1234  0.0  0.0  21472  5204 pts/0 Ss 10:00 0:00 bash\nenzo      4523 99.0  5.2 312456 42000 ?    R  10:15 5:42 python train.py\n...', explanation: 'Mostra TODOS os processos do sistema. Nota: `a` = todos os usuários, `u` = formato orientado ao usuário, `x` = inclui processos sem terminal.' },
+      { command: 'kill 4523', output: '', explanation: 'Envia SIGTERM para o PID 4523. O processo tem a chance de limpar e sair graciosamente.' },
+      { command: 'kill -9 4523', output: '', explanation: 'Envia SIGKILL — morte instantânea. O processo não pode capturar ou ignorar este sinal. Use apenas se o kill normal falhar.' },
+      { command: 'jobs', output: '[1]+  Stopped                 vim server.conf\n[2]-  Running                 python backup.py &', explanation: 'Lista os jobs no seu shell. Job 1 está parado (Ctrl+Z), Job 2 está rodando em background.' },
+      { command: 'fg %1', output: '(vim resumes in foreground)', explanation: 'Traz o job 1 (vim) de volta ao foreground para você interagir com ele.' },
     ],
   },
 
@@ -55,129 +55,129 @@ export const processMgmtModule: Module = {
       { pattern: /^bg\s+%?\d*$/, output: '[1]+ python backup.py &', description: 'Resume job in background' },
     ],
     contextHints: [
-      'Try `ps` to see your current shell processes.',
-      'Use `ps aux` to see ALL processes on the system — every user, every process.',
-      'Use `top` for a live, real-time view of processes sorted by CPU usage.',
-      'Find a specific process: `ps aux | grep python`.',
-      'Kill a process with `kill PID` — use the PID from `ps` output.',
-      'If a process won\'t die, use `kill -9 PID` to force it.',
-      'Use `jobs` to see background/suspended processes in your shell.',
-      'Use `pstree` to visualize process parent-child relationships.',
+      'Tente `ps` para ver os processos do seu shell atual.',
+      'Use `ps aux` para ver TODOS os processos no sistema — cada usuário, cada processo.',
+      'Use `top` para uma visão ao vivo, em tempo real, dos processos ordenados por uso de CPU.',
+      'Encontre um processo específico: `ps aux | grep python`.',
+      'Mate um processo com `kill PID` — use o PID da saída do `ps`.',
+      'Se um processo não morrer, use `kill -9 PID` para forçar.',
+      'Use `jobs` para ver processos em background/suspensos no seu shell.',
+      'Use `pstree` para visualizar relações pai-filho entre processos.',
     ],
   },
 
   drills: [
     {
       id: 'process-drill-1',
-      prompt: 'List the processes running in your current terminal session.',
+      prompt: 'Liste os processos rodando na sua sessão de terminal atual.',
       difficulty: 'easy',
       check: (cmd) => cmd.trim() === 'ps',
       expectedOutput: '  PID TTY          TIME CMD\n 1234 pts/0    00:00:00 bash\n 5678 pts/0    00:00:00 ps',
       hints: [
-        'The command is just two letters. It stands for "process status".',
+        'O comando tem apenas duas letras. Significa "process status".',
       ],
       feedbackRules: [
-        { pattern: /^ps\s+aux/, message: 'That shows ALL system processes. For just your terminal\'s processes, plain `ps` is enough.' },
-        { pattern: /^top$/, message: '`top` is a live monitor. For a simple snapshot, use `ps`.' },
-        { pattern: /^processes/i, message: 'The command for listing processes is `ps` (process status).' },
-        { pattern: /^ls$/, message: '`ls` lists files, not processes. Use `ps` to list processes.' },
+        { pattern: /^ps\s+aux/, message: 'Isso mostra TODOS os processos do sistema. Para apenas os do seu terminal, `ps` sozinho basta.' },
+        { pattern: /^top$/, message: '`top` é um monitor ao vivo. Para um snapshot simples, use `ps`.' },
+        { pattern: /^processes/i, message: 'O comando para listar processos é `ps` (process status).' },
+        { pattern: /^ls$/, message: '`ls` lista arquivos, não processos. Use `ps` para listar processos.' },
       ],
       xp: 50,
     },
     {
       id: 'process-drill-2',
-      prompt: 'Show ALL processes on the entire system, from every user, with full details (user, PID, CPU, memory).',
+      prompt: 'Mostre TODOS os processos de todo o sistema, de cada usuário, com detalhes completos (usuário, PID, CPU, memória).',
       difficulty: 'easy',
       check: (cmd) => /^ps\s+aux$/.test(cmd.trim()),
       expectedOutput: 'USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND\nroot         1  0.0  0.1 169316 11892 ?        Ss   09:00   0:03 /sbin/init\n...',
       hints: [
-        'You need `ps` with three flags: `a` (all users), `u` (user format), `x` (include processes without a terminal).',
-        'The command is: `ps aux`',
+        'Você precisa de `ps` com três flags: `a` (todos os usuários), `u` (formato de usuário), `x` (inclui processos sem terminal).',
+        'O comando é: `ps aux`',
       ],
       feedbackRules: [
-        { pattern: /^ps$/, message: 'Plain `ps` only shows your terminal\'s processes. Add `aux` to see everything: `ps aux`.' },
-        { pattern: /^ps\s+-aux$/, message: 'Almost! The BSD-style flags don\'t use a dash: `ps aux` (not `ps -aux`).' },
-        { pattern: /^ps\s+-ef$/, message: '`ps -ef` works too in practice! But this drill asks for the `aux` format: `ps aux`.' },
-        { pattern: /^ps\s+a$/, message: 'You need all three flags: `a` (all users), `u` (user format), `x` (no-tty). Use `ps aux`.' },
+        { pattern: /^ps$/, message: '`ps` sozinho só mostra os processos do seu terminal. Adicione `aux` para ver tudo: `ps aux`.' },
+        { pattern: /^ps\s+-aux$/, message: 'Quase! As flags no estilo BSD não usam traço: `ps aux` (não `ps -aux`).' },
+        { pattern: /^ps\s+-ef$/, message: '`ps -ef` funciona na prática! Mas este drill pede o formato `aux`: `ps aux`.' },
+        { pattern: /^ps\s+a$/, message: 'Você precisa das três flags: `a` (todos os usuários), `u` (formato de usuário), `x` (sem tty). Use `ps aux`.' },
       ],
       xp: 50,
     },
     {
       id: 'process-drill-3',
-      prompt: 'A process with PID 1234 is misbehaving. Send it a termination signal to ask it to stop gracefully.',
+      prompt: 'Um processo com PID 1234 está se comportando mal. Envie um sinal de terminação para pedir que ele pare graciosamente.',
       difficulty: 'medium',
       check: (cmd) => /^kill\s+1234$/.test(cmd.trim()),
       expectedOutput: '',
       hints: [
-        'The command to stop a process is `kill` followed by the PID.',
-        'For a graceful stop, just use `kill PID` — no extra flags needed.',
+        'O comando para parar um processo é `kill` seguido do PID.',
+        'Para uma parada graciosa, basta usar `kill PID` — sem flags extras.',
       ],
       feedbackRules: [
-        { pattern: /^kill\s+-9\s+1234$/, message: '`kill -9` is a force kill — it doesn\'t give the process a chance to clean up. Try plain `kill 1234` first.' },
-        { pattern: /^kill$/, message: 'You need to specify the PID: `kill 1234`.' },
-        { pattern: /^stop\s+1234/i, message: '`stop` is not a standard command. Use `kill 1234` to send a termination signal.' },
-        { pattern: /^kill\s+-SIGTERM\s+1234$/, message: 'That\'s technically correct! But `kill 1234` sends SIGTERM by default — no flag needed.' },
-        { pattern: /^kill\s+-15\s+1234$/, message: 'Signal 15 is SIGTERM, which is the default. You can just use `kill 1234`.' },
+        { pattern: /^kill\s+-9\s+1234$/, message: '`kill -9` é um kill forçado — não dá chance ao processo de limpar. Tente `kill 1234` primeiro.' },
+        { pattern: /^kill$/, message: 'Você precisa especificar o PID: `kill 1234`.' },
+        { pattern: /^stop\s+1234/i, message: '`stop` não é um comando padrão. Use `kill 1234` para enviar um sinal de terminação.' },
+        { pattern: /^kill\s+-SIGTERM\s+1234$/, message: 'Tecnicamente correto! Mas `kill 1234` envia SIGTERM por padrão — sem flag necessária.' },
+        { pattern: /^kill\s+-15\s+1234$/, message: 'Sinal 15 é SIGTERM, que é o padrão. Você pode usar apenas `kill 1234`.' },
       ],
       xp: 75,
     },
     {
       id: 'process-drill-4',
-      prompt: 'Find all python processes running on the system. Use `ps aux` piped to a filter command.',
+      prompt: 'Encontre todos os processos python rodando no sistema. Use `ps aux` com pipe para um comando de filtro.',
       difficulty: 'hard',
       check: (cmd) => /^ps\s+aux\s*\|\s*grep\s+['"]?python['"]?$/.test(cmd.trim()),
       expectedOutput: 'enzo      4523 99.0  5.2 312456 42000 ?        R    10:15   5:42 python train.py\nenzo      5679  0.0  0.0  12340   540 pts/0    S+   10:30   0:00 grep python',
       hints: [
-        'You need two commands connected by a pipe: one to list all processes, one to filter.',
-        'Use `ps aux` to list processes, then pipe to `grep python` to filter.',
+        'Você precisa de dois comandos conectados por um pipe: um para listar todos os processos, outro para filtrar.',
+        'Use `ps aux` para listar processos, depois pipe para `grep python` para filtrar.',
       ],
       feedbackRules: [
-        { pattern: /^ps\s+aux$/, message: 'That shows all processes, but there are too many! Pipe to `grep python` to filter: `ps aux | grep python`.' },
-        { pattern: /^grep\s+['"]?python['"]?\s*$/, message: '`grep` needs input. Pipe `ps aux` into it: `ps aux | grep python`.' },
-        { pattern: /^ps\s+aux\s*\|\s*grep$/, message: 'You need to tell `grep` what to search for: `ps aux | grep python`.' },
-        { pattern: /^ps\s*\|\s*grep\s+['"]?python['"]?$/, message: 'Plain `ps` only shows your terminal\'s processes. Use `ps aux` to search all processes: `ps aux | grep python`.' },
-        { pattern: /^pgrep\s+python$/, message: '`pgrep` is a shortcut that exists in real Linux! But this drill asks you to practice pipes: `ps aux | grep python`.' },
+        { pattern: /^ps\s+aux$/, message: 'Isso mostra todos os processos, mas são muitos! Passe por pipe para `grep python` para filtrar: `ps aux | grep python`.' },
+        { pattern: /^grep\s+['"]?python['"]?\s*$/, message: '`grep` precisa de entrada. Passe `ps aux` por pipe: `ps aux | grep python`.' },
+        { pattern: /^ps\s+aux\s*\|\s*grep$/, message: 'Você precisa dizer ao `grep` o que buscar: `ps aux | grep python`.' },
+        { pattern: /^ps\s*\|\s*grep\s+['"]?python['"]?$/, message: '`ps` sozinho só mostra os processos do seu terminal. Use `ps aux` para buscar todos: `ps aux | grep python`.' },
+        { pattern: /^pgrep\s+python$/, message: '`pgrep` é um atalho que existe no Linux real! Mas este drill pede para praticar pipes: `ps aux | grep python`.' },
       ],
       xp: 125,
     },
   ],
 
   boss: {
-    title: 'The Runaway Process',
-    scenario: 'A rogue process is eating 99% CPU and the server is grinding to a halt. Users are complaining. Find the runaway process and terminate it before the system becomes unresponsive!',
+    title: 'O Processo Descontrolado',
+    scenario: 'Um processo descontrolado está consumindo 99% da CPU e o servidor está travando. Usuários estão reclamando. Encontre o processo fugitivo e termine-o antes que o sistema fique irresponsivo!',
     steps: [
       {
         id: 'boss-process-1',
-        prompt: '> Alarms are going off! The server is slow. First, get a full view of all running processes to see what\'s consuming resources.',
+        prompt: '> Os alarmes estão disparando! O servidor está lento. Primeiro, obtenha uma visão completa de todos os processos em execução para ver o que está consumindo recursos.',
         check: (cmd) => /^ps\s+aux$/.test(cmd.trim()) || cmd.trim() === 'top',
         expectedOutput: 'USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND\nroot         1  0.0  0.1 169316 11892 ?        Ss   09:00   0:03 /sbin/init\nroot        42  0.0  0.0  34568  2704 ?        Ss   09:00   0:00 /usr/sbin/cron\nwww-data   110  0.2  1.5 298764 12340 ?        S    09:01   0:15 /usr/sbin/apache2\nenzo      1234  0.0  0.0  21472  5204 pts/0    Ss   10:00   0:00 bash\nenzo      2345  0.5  2.1 156432 17200 ?        S    10:05   0:30 node server.js\nroot      3456  0.0  0.3  45672  2508 ?        Ss   09:00   0:01 /usr/sbin/sshd\nenzo      4523 99.0  5.2 312456 42000 ?        R    10:15   5:42 python train.py\nenzo      5678  0.0  0.0  18340  1200 pts/0    R+   10:30   0:00 ps aux',
-        hints: ['Use `ps aux` or `top` to see all processes with resource usage.'],
+        hints: ['Use `ps aux` ou `top` para ver todos os processos com uso de recursos.'],
         feedbackRules: [
-          { pattern: /^ps$/, message: 'Plain `ps` only shows your terminal processes. Use `ps aux` to see ALL processes and their CPU usage.' },
-          { pattern: /^ls/, message: '`ls` lists files. To see running processes, use `ps aux`.' },
+          { pattern: /^ps$/, message: '`ps` sozinho só mostra os processos do seu terminal. Use `ps aux` para ver TODOS os processos e o uso de CPU.' },
+          { pattern: /^ls/, message: '`ls` lista arquivos. Para ver processos em execução, use `ps aux`.' },
         ],
       },
       {
         id: 'boss-process-2',
-        prompt: '> You can see something using 99% CPU! It\'s a python process. Let\'s zoom in — filter the process list to show only python processes.',
+        prompt: '> Dá pra ver algo usando 99% de CPU! É um processo python. Vamos dar zoom — filtre a lista de processos para mostrar apenas os processos python.',
         check: (cmd) => /^ps\s+aux\s*\|\s*grep\s+['"]?python['"]?$/.test(cmd.trim()),
         expectedOutput: 'enzo      4523 99.0  5.2 312456 42000 ?        R    10:15   5:42 python train.py\nenzo      5679  0.0  0.0  12340   540 pts/0    S+   10:30   0:00 grep python',
-        hints: ['Pipe `ps aux` to `grep python` to isolate the python processes.'],
+        hints: ['Passe `ps aux` por pipe para `grep python` para isolar os processos python.'],
         feedbackRules: [
-          { pattern: /^grep\s+['"]?python['"]?\s*$/, message: '`grep` needs input! Pipe from `ps aux`: `ps aux | grep python`.' },
-          { pattern: /^ps\s+aux$/, message: 'That shows everything. Filter it: `ps aux | grep python`.' },
+          { pattern: /^grep\s+['"]?python['"]?\s*$/, message: '`grep` precisa de entrada! Passe por pipe do `ps aux`: `ps aux | grep python`.' },
+          { pattern: /^ps\s+aux$/, message: 'Isso mostra tudo. Filtre: `ps aux | grep python`.' },
         ],
       },
       {
         id: 'boss-process-3',
-        prompt: '> Found it! PID 4523 — `python train.py` — is the culprit at 99% CPU. Terminate it now!',
+        prompt: '> Encontrei! PID 4523 — `python train.py` — é o culpado com 99% de CPU. Termine-o agora!',
         check: (cmd) => /^kill\s+(-9\s+)?4523$/.test(cmd.trim()),
         expectedOutput: '',
-        hints: ['Use `kill 4523` to send a termination signal. If it doesn\'t respond, use `kill -9 4523`.'],
+        hints: ['Use `kill 4523` para enviar um sinal de terminação. Se não responder, use `kill -9 4523`.'],
         feedbackRules: [
-          { pattern: /^kill\s+python/i, message: 'You need to kill by PID, not by name. The PID is 4523: `kill 4523`.' },
-          { pattern: /^kill$/, message: 'Specify the PID! The rogue process is PID 4523: `kill 4523`.' },
-          { pattern: /^kill\s+(?!(-9\s+)?4523)\d+$/, message: 'Check the PID! The rogue python process is PID 4523.' },
+          { pattern: /^kill\s+python/i, message: 'Você precisa matar pelo PID, não pelo nome. O PID é 4523: `kill 4523`.' },
+          { pattern: /^kill$/, message: 'Especifique o PID! O processo problemático é o PID 4523: `kill 4523`.' },
+          { pattern: /^kill\s+(?!(-9\s+)?4523)\d+$/, message: 'Confira o PID! O processo python descontrolado é o PID 4523.' },
         ],
       },
     ],

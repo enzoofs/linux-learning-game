@@ -11,10 +11,10 @@ interface LayoutProps {
 
 const NAV_TABS: { id: View; label: string }[] = [
   { id: 'terminal', label: '> Terminal' },
-  { id: 'map', label: 'Skill Tree' },
-  { id: 'journal', label: 'Journal' },
-  { id: 'achievements', label: 'Achievements' },
-  { id: 'stats', label: 'Stats' },
+  { id: 'map', label: 'Árvore de Skills' },
+  { id: 'journal', label: 'Diário' },
+  { id: 'achievements', label: 'Conquistas' },
+  { id: 'stats', label: 'Estatísticas' },
 ];
 
 export function Layout({ currentView, onViewChange, children }: LayoutProps) {
@@ -42,20 +42,20 @@ export function Layout({ currentView, onViewChange, children }: LayoutProps) {
               ART OF CLI QUEST
             </div>
             <div className="text-[11px] text-slate-500 mt-0.5 tracking-wider">
-              LEARN LINUX LIKE A GAME
+              APRENDA LINUX COMO UM JOGO
             </div>
           </div>
           <div className="flex items-center gap-4">
             {currentStreak > 0 && (
               <div className="text-sm text-orange-400 font-semibold">
-                🔥 {currentStreak}d streak
+                🔥 {currentStreak}d seguidos
               </div>
             )}
             <div className="text-right">
               <div className="flex items-center gap-1.5">
                 <span className="text-lg">{tier.icon}</span>
                 <span className="font-bold text-sm" style={{ color: tier.color }}>
-                  {tier.name}
+                  {tier.displayName}
                 </span>
               </div>
               <div className="text-amber-400 text-sm font-semibold">{totalXP} XP</div>
@@ -75,9 +75,9 @@ export function Layout({ currentView, onViewChange, children }: LayoutProps) {
           />
         </div>
         <div className="flex justify-between mt-1">
-          <span className="text-[10px] text-slate-600">{tier.name}</span>
+          <span className="text-[10px] text-slate-600">{tier.displayName}</span>
           <span className="text-[10px] text-slate-600">
-            {nextTier ? `${nextTier.name} (${nextTier.minXP} XP)` : 'MAX RANK'}
+            {nextTier ? `${nextTier.displayName} (${nextTier.minXP} XP)` : 'RANK MÁXIMO'}
           </span>
         </div>
 
