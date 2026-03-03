@@ -1,4 +1,4 @@
-import { DrillFeedbackRule } from '../types';
+import type { DrillFeedbackRule } from '../types';
 
 export type FeedbackType = 'success' | 'feedback' | 'typo' | 'error' | 'empty';
 

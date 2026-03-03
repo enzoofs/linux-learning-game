@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 
 type View = 'terminal' | 'map' | 'journal' | 'achievements' | 'stats';

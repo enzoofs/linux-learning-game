@@ -1,4 +1,4 @@
-import { Module } from '../../types';
+import type { Module } from '../../types';
 
 export const cliBasicsModule: Module = {
   id: 'cli-basics',

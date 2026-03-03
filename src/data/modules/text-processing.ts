@@ -1,4 +1,4 @@
-import { Module } from '../../types';
+import type { Module } from '../../types';
 
 export const textProcessingModule: Module = {
   id: 'text-processing',

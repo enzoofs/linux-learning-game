@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Module, ModulePhase } from '../../types';
+import type { Module, ModulePhase } from '../../types';
 import { Terminal } from '../Terminal/Terminal';
 import { Briefing } from '../Briefing/Briefing';
 import { useTerminal } from '../../hooks/useTerminal';

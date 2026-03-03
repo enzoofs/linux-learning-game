@@ -1,6 +1,6 @@
 import { useGameStore } from '../../stores/gameStore';
 import { ACHIEVEMENTS } from '../../data/achievements';
-import { AchievementCategory } from '../../types';
+import type { AchievementCategory } from '../../types';
 
 const CATEGORY_LABELS: Record<AchievementCategory, string> = {
   mastery: '🏅 Mastery',
