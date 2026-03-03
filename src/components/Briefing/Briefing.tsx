@@ -1,4 +1,4 @@
-import { Briefing as BriefingData } from '../../types';
+import type { Briefing as BriefingData } from '../../types';
 
 interface BriefingProps {
   title: string;

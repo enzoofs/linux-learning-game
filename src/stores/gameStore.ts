@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { GameState, DrillAttempt, Tier } from '../types';
+import type { GameState, DrillAttempt, Tier } from '../types';
 import { getCurrentTier, getNextTier } from '../data/tiers';
 import { saveState, loadState, clearState } from '../utils/persistence';
 

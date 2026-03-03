@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { TerminalLine } from '../types';
+import type { TerminalLine } from '../types';
 
 export function useTerminal(initialLines: TerminalLine[] = []) {
   const [lines, setLines] = useState<TerminalLine[]>(initialLines);
