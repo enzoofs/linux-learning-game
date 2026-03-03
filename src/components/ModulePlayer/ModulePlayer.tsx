@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Module, ModulePhase } from '../../types';
 import { Terminal } from '../Terminal/Terminal';
 import { Briefing } from '../Briefing/Briefing';
@@ -6,6 +6,7 @@ import { useTerminal } from '../../hooks/useTerminal';
 import { useGameStore } from '../../stores/gameStore';
 import { analyzeCommand } from '../../utils/commandParser';
 import { getLearnedCommands } from '../../data/modules';
+import { VirtualFS } from '../../utils/virtualFS';
 
 const DIFFICULTY_LABELS: Record<string, string> = {
   easy: 'FÁCIL',
@@ -44,6 +45,15 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
   const [usedHint, setUsedHint] = useState(false);
 
   const terminal = useTerminal();
+
+  // Virtual filesystem for sandbox/drill/boss modes
+  const vfsRef = useRef(new VirtualFS(module.initialFS));
+  const [cwdDisplay, setCwdDisplay] = useState('~');
+
+  const updateCwd = useCallback(() => {
+    const cwd = vfsRef.current.pwd();
+    setCwdDisplay(cwd.replace('/home/enzo', '~') || '~');
+  }, []);
 
   // Sync session state to store on every phase/drill/boss change
   useEffect(() => {
@@ -111,6 +121,19 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
 
     // Check sandbox commands
     const baseCmd = cmd.split(/\s+/)[0];
+
+    // Try VFS first
+    const vfsResult = vfsRef.current.executeCommand(cmd);
+    if (vfsResult.handled) {
+      if (vfsResult.output) {
+        terminal.addLine({ type: vfsResult.isError ? 'error' : 'output', text: vfsResult.output });
+      }
+      updateCwd();
+      trackSandboxCommand(baseCmd);
+      terminal.setInputValue('');
+      return;
+    }
+
     trackSandboxCommand(baseCmd);
 
     let matched = false;
@@ -146,7 +169,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     }
 
     terminal.setInputValue('');
-  }, [terminal, module.sandbox.commands, trackSandboxCommand]);
+  }, [terminal, module.sandbox.commands, trackSandboxCommand, updateCwd]);
 
   const handleDrillSubmit = useCallback(() => {
     const cmd = terminal.inputValue.trim();
@@ -181,6 +204,10 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     const result = analyzeCommand(cmd, currentDrill.check, currentDrill.feedbackRules);
 
     if (result.type === 'success') {
+      // Execute against VFS to update filesystem state
+      vfsRef.current.executeCommand(cmd);
+      updateCwd();
+
       if (currentDrill.expectedOutput) {
         terminal.addLine({ type: 'output', text: currentDrill.expectedOutput });
       }
@@ -216,27 +243,37 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     } else if (result.type === 'typo') {
       terminal.addLine({ type: 'feedback', text: result.message });
     } else {
-      // Check if it's a learned command before showing generic error
-      const { completedModules } = useGameStore.getState();
-      const learnedCommands = getLearnedCommands(completedModules);
-      let isLearned = false;
-      for (const learnedCmd of learnedCommands) {
-        if (learnedCmd.pattern.test(cmd)) {
-          if (learnedCmd.output) {
-            terminal.addLine({ type: 'output', text: learnedCmd.output });
-          }
-          terminal.addLine({ type: 'learned', text: 'Comando reconhecido, mas não é a resposta para este exercício.' });
-          isLearned = true;
-          break;
+      // Try VFS first
+      const vfsResult = vfsRef.current.executeCommand(cmd);
+      if (vfsResult.handled) {
+        if (vfsResult.output) {
+          terminal.addLine({ type: 'output', text: vfsResult.output });
         }
-      }
-      if (!isLearned) {
-        terminal.addLine({ type: 'error', text: result.message });
+        terminal.addLine({ type: 'learned', text: 'Comando reconhecido, mas não é a resposta para este exercício.' });
+        updateCwd();
+      } else {
+        // Then check learned commands before showing generic error
+        const { completedModules } = useGameStore.getState();
+        const learnedCommands = getLearnedCommands(completedModules);
+        let isLearned = false;
+        for (const learnedCmd of learnedCommands) {
+          if (learnedCmd.pattern.test(cmd)) {
+            if (learnedCmd.output) {
+              terminal.addLine({ type: 'output', text: learnedCmd.output });
+            }
+            terminal.addLine({ type: 'learned', text: 'Comando reconhecido, mas não é a resposta para este exercício.' });
+            isLearned = true;
+            break;
+          }
+        }
+        if (!isLearned) {
+          terminal.addLine({ type: 'error', text: result.message });
+        }
       }
     }
 
     terminal.setInputValue('');
-  }, [terminal, currentDrill, currentDrillIndex, drillAttempts, drillStartTime, usedHint, module, addXP, completeDrill]);
+  }, [terminal, currentDrill, currentDrillIndex, drillAttempts, drillStartTime, usedHint, module, addXP, completeDrill, updateCwd]);
 
   const handleBossSubmit = useCallback(() => {
     const cmd = terminal.inputValue.trim();
@@ -254,6 +291,10 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     const result = analyzeCommand(cmd, currentBoss.check, currentBoss.feedbackRules);
 
     if (result.type === 'success') {
+      // Execute against VFS to update filesystem state
+      vfsRef.current.executeCommand(cmd);
+      updateCwd();
+
       if (currentBoss.expectedOutput) {
         terminal.addLine({ type: 'output', text: currentBoss.expectedOutput });
       }
@@ -286,27 +327,37 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     } else if (result.type === 'feedback') {
       terminal.addLine({ type: 'feedback', text: result.message });
     } else {
-      // Check if it's a learned command before showing generic error
-      const { completedModules } = useGameStore.getState();
-      const learnedCommands = getLearnedCommands(completedModules);
-      let isLearned = false;
-      for (const learnedCmd of learnedCommands) {
-        if (learnedCmd.pattern.test(cmd)) {
-          if (learnedCmd.output) {
-            terminal.addLine({ type: 'output', text: learnedCmd.output });
-          }
-          terminal.addLine({ type: 'learned', text: 'Comando reconhecido, mas não é a resposta para este exercício.' });
-          isLearned = true;
-          break;
+      // Try VFS first
+      const vfsResult = vfsRef.current.executeCommand(cmd);
+      if (vfsResult.handled) {
+        if (vfsResult.output) {
+          terminal.addLine({ type: 'output', text: vfsResult.output });
         }
-      }
-      if (!isLearned) {
-        terminal.addLine({ type: 'error', text: result.message });
+        terminal.addLine({ type: 'learned', text: 'Comando reconhecido, mas não é a resposta para este exercício.' });
+        updateCwd();
+      } else {
+        // Then check learned commands before showing generic error
+        const { completedModules } = useGameStore.getState();
+        const learnedCommands = getLearnedCommands(completedModules);
+        let isLearned = false;
+        for (const learnedCmd of learnedCommands) {
+          if (learnedCmd.pattern.test(cmd)) {
+            if (learnedCmd.output) {
+              terminal.addLine({ type: 'output', text: learnedCmd.output });
+            }
+            terminal.addLine({ type: 'learned', text: 'Comando reconhecido, mas não é a resposta para este exercício.' });
+            isLearned = true;
+            break;
+          }
+        }
+        if (!isLearned) {
+          terminal.addLine({ type: 'error', text: result.message });
+        }
       }
     }
 
     terminal.setInputValue('');
-  }, [terminal, currentBoss, currentBossStep, module, addXP, completeBoss, completeModule, addFreezeToken, clearSession, onModuleComplete]);
+  }, [terminal, currentBoss, currentBossStep, module, addXP, completeBoss, completeModule, addFreezeToken, clearSession, onModuleComplete, updateCwd]);
 
   const handleSubmit = useCallback(() => {
     if (phase === 'sandbox') handleSandboxSubmit();
@@ -345,7 +396,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
           onSubmit={handleSubmit}
           inputRef={terminal.inputRef}
           endRef={terminal.endRef}
-          prompt={`enzo@linux ~/${module.id} $`}
+          prompt={`enzo@linux ${cwdDisplay} $`}
           placeholder={
             phase === 'sandbox' ? "experimente à vontade... ('done' para continuar)"
             : phase === 'boss' ? "resolva o desafio... ('hint' para ajuda)"

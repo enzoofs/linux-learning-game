@@ -157,6 +157,7 @@ export class VirtualFS {
     const showHidden = parsedFlags.has('a');
     const longFormat = parsedFlags.has('l');
     const reverseSort = parsedFlags.has('r');
+    const sortByTime = parsedFlags.has('t');
 
     let items = [...(node.children ?? [])];
 
@@ -167,6 +168,11 @@ export class VirtualFS {
 
     // Sort alphabetically (case-insensitive)
     items.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+
+    // -t simulates time sort by reversing (newest first)
+    if (sortByTime) {
+      items.reverse();
+    }
 
     if (reverseSort) {
       items.reverse();

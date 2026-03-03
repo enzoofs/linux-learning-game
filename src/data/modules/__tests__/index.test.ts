@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getLearnedCommands, getModuleById, ALL_MODULES } from '../index';
+import { getLearnedCommands, getModuleById } from '../index';
 
 describe('modules index', () => {
   it('getModuleById returns correct module', () => {

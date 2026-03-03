@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { GameState, DrillAttempt, Tier, ModulePhase } from '../types';
+import type { GameState, DrillAttempt, Tier, ModulePhase, AppView } from '../types';
 import { getCurrentTier, getNextTier } from '../data/tiers';
 import { saveState, loadState, clearState } from '../utils/persistence';
 
@@ -18,7 +18,7 @@ interface GameActions {
   getNextTier: () => Tier | null;
   getXpMultiplier: () => number;
   setSession: (moduleId: string, phase: ModulePhase, drillIndex: number, bossStep: number) => void;
-  setCurrentView: (view: string) => void;
+  setCurrentView: (view: AppView) => void;
   clearSession: () => void;
   reset: () => void;
 }
