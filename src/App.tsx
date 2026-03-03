@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Layout } from './components/Layout/Layout';
 import { ModulePlayer } from './components/ModulePlayer/ModulePlayer';
+import { SkillTree } from './components/SkillTree/SkillTree';
 import { cliBasicsModule } from './data/modules/cli-basics';
+import { getModuleById } from './data/modules';
 import { Module } from './types';
 
 type View = 'terminal' | 'map' | 'journal' | 'achievements' | 'stats';
@@ -20,9 +22,13 @@ function App() {
         />
       )}
       {view === 'map' && (
-        <div className="p-6 text-slate-400 text-center min-h-[300px] flex items-center justify-center">
-          Skill Tree — coming in Task 10-11
-        </div>
+        <SkillTree onSelectModule={(id) => {
+          const mod = getModuleById(id);
+          if (mod) {
+            setActiveModule(mod);
+            setView('terminal');
+          }
+        }} />
       )}
       {view === 'journal' && (
         <div className="p-6 text-slate-400 text-center min-h-[300px] flex items-center justify-center">
