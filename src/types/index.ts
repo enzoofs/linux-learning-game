@@ -171,4 +171,10 @@ export interface GameState {
   lastPlayDate: string | null;
   freezeTokens: number;
   totalPlayTimeMs: number;
+  // Session persistence
+  currentModuleId: string | null;
+  currentPhase: ModulePhase | null;
+  currentDrillIndex: number;
+  currentBossStep: number;
+  currentView: string;
 }
