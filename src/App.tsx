@@ -5,19 +5,18 @@ import { SkillTree } from './components/SkillTree/SkillTree';
 import { Achievements } from './components/Achievements/Achievements';
 import { Stats } from './components/Stats/Stats';
 import { Journal } from './components/Journal/Journal';
+import { Chat } from './components/Chat/Chat';
 import { useAchievementDetection } from './hooks/useAchievements';
 import { useGameStore } from './stores/gameStore';
 import { cliBasicsModule } from './data/modules/cli-basics';
 import { getModuleById } from './data/modules';
-import type { Module } from './types';
+import type { Module, AppView } from './types';
 
-type View = 'terminal' | 'map' | 'journal' | 'achievements' | 'stats';
+const VALID_VIEWS: AppView[] = ['terminal', 'map', 'journal', 'achievements', 'stats'];
 
-const VALID_VIEWS: View[] = ['terminal', 'map', 'journal', 'achievements', 'stats'];
-
-function resolveInitialView(): View {
+function resolveInitialView(): AppView {
   const saved = useGameStore.getState().currentView;
-  return VALID_VIEWS.includes(saved as View) ? (saved as View) : 'terminal';
+  return VALID_VIEWS.includes(saved) ? saved : 'terminal';
 }
 
 function resolveInitialModule(): Module | null {
@@ -30,12 +29,12 @@ function resolveInitialModule(): Module | null {
 }
 
 function App() {
-  const [view, setView] = useState<View>(resolveInitialView);
+  const [view, setView] = useState<AppView>(resolveInitialView);
   const [activeModule, setActiveModule] = useState<Module | null>(resolveInitialModule);
   const { updateStreak, addPlayTime, setCurrentView } = useGameStore();
   const sessionStart = useRef(Date.now());
 
-  const handleSetView = useCallback((v: View) => {
+  const handleSetView = useCallback((v: AppView) => {
     setView(v);
     setCurrentView(v);
   }, [setCurrentView]);
@@ -57,27 +56,33 @@ function App() {
   }, []);
 
   return (
-    <Layout currentView={view} onViewChange={handleSetView}>
-      {view === 'terminal' && activeModule && (
-        <ModulePlayer
-          key={activeModule.id}
-          module={activeModule}
-          onModuleComplete={() => handleSetView('map')}
-        />
-      )}
-      {view === 'map' && (
-        <SkillTree onSelectModule={(id) => {
-          const mod = getModuleById(id);
-          if (mod) {
-            setActiveModule(mod);
-            handleSetView('terminal');
-          }
-        }} />
-      )}
-      {view === 'journal' && <Journal />}
-      {view === 'achievements' && <Achievements />}
-      {view === 'stats' && <Stats />}
-    </Layout>
+    <>
+      <Layout currentView={view} onViewChange={handleSetView}>
+        {view === 'terminal' && activeModule && (
+          <ModulePlayer
+            key={activeModule.id}
+            module={activeModule}
+            onModuleComplete={() => handleSetView('map')}
+          />
+        )}
+        {view === 'map' && (
+          <SkillTree onSelectModule={(id) => {
+            const mod = getModuleById(id);
+            if (mod) {
+              setActiveModule(mod);
+              handleSetView('terminal');
+            }
+          }} />
+        )}
+        {view === 'journal' && <Journal />}
+        {view === 'achievements' && <Achievements />}
+        {view === 'stats' && <Stats />}
+      </Layout>
+      <Chat moduleContext={activeModule ? {
+        title: activeModule.title,
+        phase: useGameStore.getState().currentPhase || 'menu',
+      } : undefined} />
+    </>
   );
 }
 
