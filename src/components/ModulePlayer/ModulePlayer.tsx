@@ -6,6 +6,12 @@ import { useTerminal } from '../../hooks/useTerminal';
 import { useGameStore } from '../../stores/gameStore';
 import { analyzeCommand } from '../../utils/commandParser';
 
+const DIFFICULTY_LABELS: Record<string, string> = {
+  easy: 'FÁCIL',
+  medium: 'MÉDIO',
+  hard: 'DIFÍCIL',
+};
+
 interface ModulePlayerProps {
   module: Module;
   onModuleComplete: () => void;
@@ -29,21 +35,21 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
   useEffect(() => {
     if (phase === 'sandbox') {
       terminal.resetWithLines([
-        { type: 'system', text: '═══ SANDBOX MODE ═══' },
-        { type: 'brief', text: 'Experiment freely! Type any commands related to this topic. No right or wrong answers here.' },
-        { type: 'hint', text: "Type 'done' when you're ready for the challenges, or 'brief' to review the briefing." },
+        { type: 'system', text: '═══ MODO SANDBOX ═══' },
+        { type: 'brief', text: 'Experimente à vontade! Digite qualquer comando relacionado ao tema. Sem certo ou errado aqui.' },
+        { type: 'hint', text: "Digite 'done' quando estiver pronto para os desafios, ou 'brief' para revisar a explicação." },
       ]);
     } else if (phase === 'drill' && currentDrill) {
       setDrillStartTime(Date.now());
       setDrillAttempts(0);
       setUsedHint(false);
       terminal.resetWithLines([
-        { type: 'system', text: `═══ DRILL ${currentDrillIndex + 1}/${module.drills.length}: ${currentDrill.difficulty.toUpperCase()} ═══` },
+        { type: 'system', text: `═══ EXERCÍCIO ${currentDrillIndex + 1}/${module.drills.length}: ${DIFFICULTY_LABELS[currentDrill.difficulty] || currentDrill.difficulty.toUpperCase()} ═══` },
         { type: 'brief', text: currentDrill.prompt },
       ]);
     } else if (phase === 'boss') {
       terminal.resetWithLines([
-        { type: 'system', text: `═══ BOSS CHALLENGE: ${module.boss.title.toUpperCase()} ═══` },
+        { type: 'system', text: `═══ 🏆 DESAFIO BOSS: ${module.boss.title.toUpperCase()} ═══` },
         { type: 'brief', text: module.boss.scenario },
         { type: 'system', text: '' },
         { type: 'brief', text: currentBoss?.prompt || '' },
@@ -68,14 +74,14 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       return;
     }
     if (cmd === 'help') {
-      terminal.addLine({ type: 'system', text: "Commands: done (start drills), brief (review briefing), help, clear" });
+      terminal.addLine({ type: 'system', text: "Comandos: done (iniciar exercícios), brief (revisar explicação), help, clear" });
       terminal.setInputValue('');
       return;
     }
     if (cmd === 'clear') {
       terminal.resetWithLines([
-        { type: 'system', text: '═══ SANDBOX MODE ═══' },
-        { type: 'hint', text: "Type 'done' when ready for challenges." },
+        { type: 'system', text: '═══ MODO SANDBOX ═══' },
+        { type: 'hint', text: "Digite 'done' quando estiver pronto." },
       ]);
       terminal.setInputValue('');
       return;
@@ -98,7 +104,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     }
 
     if (!matched) {
-      terminal.addLine({ type: 'system', text: `${cmd}: command simulated — try commands related to this module's topic!` });
+      terminal.addLine({ type: 'system', text: `${cmd}: comando simulado — tente comandos relacionados ao tema deste módulo!` });
     }
 
     terminal.setInputValue('');
@@ -118,7 +124,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       return;
     }
     if (cmd === 'help') {
-      terminal.addLine({ type: 'system', text: "Commands: hint (get a clue), skip (skip this drill), help" });
+      terminal.addLine({ type: 'system', text: "Comandos: hint (pedir dica), skip (pular exercício), help" });
       terminal.setInputValue('');
       return;
     }
@@ -140,7 +146,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       if (currentDrill.expectedOutput) {
         terminal.addLine({ type: 'output', text: currentDrill.expectedOutput });
       }
-      terminal.addLine({ type: 'success', text: `CORRECT! +${currentDrill.xp} XP` });
+      terminal.addLine({ type: 'success', text: `CORRETO! +${currentDrill.xp} XP` });
 
       addXP(currentDrill.xp);
       completeDrill({
@@ -154,7 +160,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       });
 
       if (!usedHint && drillAttempts === 0) {
-        terminal.addLine({ type: 'levelup', text: 'FIRST TRY BONUS! +25 XP' });
+        terminal.addLine({ type: 'levelup', text: 'BÔNUS DE PRIMEIRA! +25 XP' });
         addXP(25);
       }
 
@@ -197,7 +203,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       if (currentBoss.expectedOutput) {
         terminal.addLine({ type: 'output', text: currentBoss.expectedOutput });
       }
-      terminal.addLine({ type: 'success', text: 'Step complete!' });
+      terminal.addLine({ type: 'success', text: 'Etapa concluída!' });
 
       const nextStep = currentBossStep + 1;
       if (nextStep < module.boss.steps.length) {
@@ -213,9 +219,9 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
         completeModule(module.id);
         addFreezeToken();
         terminal.addLine({ type: 'system', text: '' });
-        terminal.addLine({ type: 'levelup', text: `BOSS DEFEATED: ${module.boss.title}! +${module.boss.xpReward} XP` });
-        terminal.addLine({ type: 'success', text: 'Earned 1 Streak Freeze Token!' });
-        terminal.addLine({ type: 'levelup', text: `MODULE COMPLETE: ${module.title}` });
+        terminal.addLine({ type: 'levelup', text: `BOSS DERROTADO: ${module.boss.title}! +${module.boss.xpReward} XP` });
+        terminal.addLine({ type: 'success', text: 'Ganhou 1 Token de Proteção de Streak!' });
+        terminal.addLine({ type: 'levelup', text: `MÓDULO COMPLETO: ${module.title}` });
 
         setTimeout(() => {
           setPhase('completed');
@@ -238,11 +244,11 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
   }, [phase, handleSandboxSubmit, handleDrillSubmit, handleBossSubmit]);
 
   const phaseLabels: Record<ModulePhase, string> = {
-    briefing: 'Briefing',
-    sandbox: 'Sandbox',
-    drill: `Drill ${currentDrillIndex + 1}/${module.drills.length}`,
-    boss: 'Boss Challenge',
-    completed: 'Completed',
+    briefing: '📖 Explicação',
+    sandbox: '🧪 Sandbox',
+    drill: `⚔️ Exercício ${currentDrillIndex + 1}/${module.drills.length}`,
+    boss: '🏆 Desafio Boss',
+    completed: '✅ Concluído',
   };
 
   return (
@@ -270,9 +276,9 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
           endRef={terminal.endRef}
           prompt={`enzo@linux ~/${module.id} $`}
           placeholder={
-            phase === 'sandbox' ? "experiment freely... ('done' to continue)"
-            : phase === 'boss' ? "solve the challenge... ('hint' for help)"
-            : "type your answer... ('hint' for help)"
+            phase === 'sandbox' ? "experimente à vontade... ('done' para continuar)"
+            : phase === 'boss' ? "resolva o desafio... ('hint' para ajuda)"
+            : "digite sua resposta... ('hint' para ajuda)"
           }
         />
       )}
@@ -280,13 +286,13 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       {phase === 'completed' && (
         <div className="p-12 text-center">
           <div className="text-4xl mb-4">&#127881;</div>
-          <div className="text-xl font-bold text-green-400 mb-2">Module Complete!</div>
-          <div className="text-slate-400 text-sm mb-6">{module.title} — all drills and boss defeated.</div>
+          <div className="text-xl font-bold text-green-400 mb-2">Módulo Concluído!</div>
+          <div className="text-slate-400 text-sm mb-6">{module.title} — todos os exercícios e boss derrotados.</div>
           <button
             onClick={onModuleComplete}
             className="px-6 py-3 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg text-cyan-400 font-semibold text-sm transition-all cursor-pointer"
           >
-            Continue to Skill Tree
+            Continuar para a Árvore de Skills →
           </button>
         </div>
       )}

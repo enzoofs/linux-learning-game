@@ -12,7 +12,7 @@ export function SkillTree({ onSelectModule }: SkillTreeProps) {
 
   return (
     <div className="p-6 overflow-auto" style={{ minHeight: 300 }}>
-      <div className="text-sm text-slate-500 mb-4 font-semibold tracking-wider">SKILL TREE</div>
+      <div className="text-sm text-slate-500 mb-4 font-semibold tracking-wider">ÁRVORE DE SKILLS</div>
 
       <svg viewBox="0 0 800 580" className="w-full max-w-2xl mx-auto">
         {/* Draw connections first (behind nodes) */}
@@ -86,7 +86,7 @@ export function SkillTree({ onSelectModule }: SkillTreeProps) {
                 textAnchor="end"
                 fontFamily="monospace"
               >
-                {mod?.tier || ''}
+                {mod ? TIERS.find((t) => t.name === mod.tier)?.displayName || mod.tier : ''}
               </text>
             </g>
           );
@@ -94,9 +94,9 @@ export function SkillTree({ onSelectModule }: SkillTreeProps) {
       </svg>
 
       <div className="flex justify-center gap-6 mt-4 text-xs text-slate-500">
-        <span>✅ Completed</span>
-        <span>▶️ Available</span>
-        <span>🔒 Locked</span>
+        <span>✅ Concluído</span>
+        <span>▶️ Disponível</span>
+        <span>🔒 Bloqueado</span>
       </div>
     </div>
   );

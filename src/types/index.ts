@@ -4,6 +4,7 @@ export type TierName = 'Recruit' | 'Operator' | 'Specialist' | 'Commander';
 
 export interface Tier {
   name: TierName;
+  displayName: string;
   color: string;
   icon: string;
   minXP: number;

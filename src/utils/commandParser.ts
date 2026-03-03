@@ -77,12 +77,12 @@ export function analyzeCommand(
     const firstWord = cmd.split(/\s+/)[0];
     return {
       type: 'typo',
-      message: `Did you mean \`${typoSuggestion}\`? You typed \`${firstWord}\`.`,
+      message: `Você quis dizer \`${typoSuggestion}\`? Você digitou \`${firstWord}\`.`,
     };
   }
 
   return {
     type: 'error',
-    message: "That's not quite right for this challenge. Type 'hint' for a clue.",
+    message: "Não é bem isso. Digite 'hint' para uma dica.",
   };
 }

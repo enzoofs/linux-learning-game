@@ -2,30 +2,30 @@ import type { Module } from '../../types';
 
 export const cliBasicsModule: Module = {
   id: 'cli-basics',
-  title: 'CLI Basics',
-  description: 'Your first steps in the terminal — navigation, listing, and creating directories.',
+  title: 'Fundamentos do CLI',
+  description: 'Seus primeiros passos no terminal — navegação, listagem e criação de diretórios.',
   tier: 'Recruit',
   prerequisites: [],
   isSideQuest: false,
 
   briefing: {
     concept:
-      `The terminal is your window into the system. Every command you type tells the computer exactly what to do — no clicking, no guessing. Let's start with the 4 most fundamental commands:\n\n` +
-      `• **pwd** — "Where am I?" Prints your current directory.\n` +
-      `• **ls** — "What's here?" Lists files and folders.\n` +
-      `• **cd** — "Take me there." Changes your directory.\n` +
-      `• **mkdir** — "Build something." Creates a new directory.`,
+      `O terminal é a sua janela para o sistema. Cada comando que você digita diz ao computador exatamente o que fazer — sem cliques, sem adivinhação. Vamos começar com os 4 comandos mais fundamentais:\n\n` +
+      `• **pwd** — "Onde eu estou?" Mostra o diretório atual.\n` +
+      `• **ls** — "O que tem aqui?" Lista arquivos e pastas.\n` +
+      `• **cd** — "Me leva lá." Muda o diretório.\n` +
+      `• **mkdir** — "Cria algo." Cria um novo diretório.`,
     analogy:
-      'Think of the terminal as a building. `pwd` tells you which room you\'re in. `ls` shows you what\'s in the room. `cd` lets you walk to another room. `mkdir` builds a new room.',
+      'Pense no terminal como um prédio. `pwd` diz em qual sala você está. `ls` mostra o que tem na sala. `cd` te leva para outra sala. `mkdir` constrói uma sala nova.',
     syntax:
       'pwd\nls [options] [path]\ncd [directory]\nmkdir [-p] directory',
     examples: [
-      { command: 'pwd', output: '/home/enzo', explanation: 'Shows your current location — the home directory.' },
-      { command: 'ls', output: 'Desktop  Documents  Downloads  Music', explanation: 'Lists everything in the current directory.' },
-      { command: 'ls -l', output: 'drwxr-xr-x 2 enzo enzo 4096 Desktop\n...', explanation: 'Long format: shows permissions, owner, size, date.' },
-      { command: 'cd Documents', output: '', explanation: 'Moves into the Documents directory. Use `cd` alone to go home.' },
-      { command: 'mkdir projects', output: '', explanation: 'Creates a new directory called "projects".' },
-      { command: 'mkdir -p a/b/c', output: '', explanation: 'Creates nested directories in one shot with -p.' },
+      { command: 'pwd', output: '/home/enzo', explanation: 'Mostra sua localização atual — o diretório home.' },
+      { command: 'ls', output: 'Desktop  Documents  Downloads  Music', explanation: 'Lista tudo no diretório atual.' },
+      { command: 'ls -l', output: 'drwxr-xr-x 2 enzo enzo 4096 Desktop\n...', explanation: 'Formato longo: mostra permissões, dono, tamanho e data.' },
+      { command: 'cd Documents', output: '', explanation: 'Entra no diretório Documents. Use `cd` sozinho para voltar ao home.' },
+      { command: 'mkdir projects', output: '', explanation: 'Cria um novo diretório chamado "projects".' },
+      { command: 'mkdir -p a/b/c', output: '', explanation: 'Cria diretórios aninhados de uma vez com -p.' },
     ],
   },
 
@@ -42,71 +42,71 @@ export const cliBasicsModule: Module = {
       { pattern: /^hostname$/, output: 'linux-quest' },
     ],
     contextHints: [
-      'Try typing `pwd` to see where you are!',
-      'Use `ls` to see what files are in the current directory.',
-      'Try `ls -l` to see detailed file information.',
-      'Use `cd Documents` to navigate into a folder.',
-      'Create a directory with `mkdir mydir`.',
+      'Tente digitar `pwd` para ver onde você está!',
+      'Use `ls` para ver quais arquivos estão no diretório atual.',
+      'Tente `ls -l` para ver informações detalhadas dos arquivos.',
+      'Use `cd Documents` para navegar até uma pasta.',
+      'Crie um diretório com `mkdir mydir`.',
     ],
   },
 
   drills: [
     {
       id: 'basics-drill-1',
-      prompt: 'Where are you right now? Print your current working directory.',
+      prompt: 'Onde você está agora? Mostre o diretório de trabalho atual.',
       difficulty: 'easy',
       check: (cmd) => cmd.trim() === 'pwd',
       expectedOutput: '/home/enzo',
-      hints: ['The command is 3 letters: p_d'],
+      hints: ['O comando tem 3 letras: p_d'],
       feedbackRules: [
-        { pattern: /^cwd$/i, message: '`cwd` is not a command — try `pwd` (print working directory).' },
-        { pattern: /^where/i, message: 'In the terminal, we use `pwd` instead of "where".' },
+        { pattern: /^cwd$/i, message: '`cwd` não é um comando — tente `pwd` (print working directory).' },
+        { pattern: /^where/i, message: 'No terminal, usamos `pwd` em vez de "where".' },
       ],
       xp: 50,
     },
     {
       id: 'basics-drill-2',
-      prompt: 'List all files including hidden ones (files starting with a dot).',
+      prompt: 'Liste todos os arquivos, incluindo os ocultos (que começam com ponto).',
       difficulty: 'easy',
       check: (cmd) => /^ls\s+-a$/.test(cmd.trim()),
       expectedOutput: '.  ..  .bashrc  .profile  .ssh  Desktop  Documents  Downloads  Music  Pictures  scripts',
-      hints: ['Use `ls` with a flag. Hidden files start with `.` — the flag is `-a` (all).'],
+      hints: ['Use `ls` com uma flag. Arquivos ocultos começam com `.` — a flag é `-a` (all).'],
       feedbackRules: [
-        { pattern: /^ls$/, message: 'Good start! But `ls` alone hides dotfiles. Add `-a` to show all.' },
-        { pattern: /^ls\s+-l$/, message: '`-l` gives long format. To see hidden files, use `-a`.' },
-        { pattern: /^ls\s+-la/, message: 'That works in practice! But for this drill, just `ls -a` is what we need.' },
+        { pattern: /^ls$/, message: 'Bom começo! Mas `ls` sozinho esconde dotfiles. Adicione `-a` para mostrar tudo.' },
+        { pattern: /^ls\s+-l$/, message: '`-l` mostra o formato longo. Para ver arquivos ocultos, use `-a`.' },
+        { pattern: /^ls\s+-la/, message: 'Isso funciona na prática! Mas para este drill, só `ls -a` é o que precisamos.' },
       ],
       xp: 50,
     },
     {
       id: 'basics-drill-3',
-      prompt: 'Navigate into the Documents directory.',
+      prompt: 'Navegue até o diretório Documents.',
       difficulty: 'medium',
       check: (cmd) => /^cd\s+Documents\/?$/.test(cmd.trim()),
       expectedOutput: '',
-      hints: ['Use `cd` followed by the directory name.'],
+      hints: ['Use `cd` seguido do nome do diretório.'],
       feedbackRules: [
-        { pattern: /^cd\s+documents/i, message: 'Almost! Linux is case-sensitive. Use `Documents` with a capital D.' },
-        { pattern: /^cd$/, message: '`cd` alone goes to your home directory. Specify the folder: `cd Documents`.' },
+        { pattern: /^cd\s+documents/i, message: 'Quase! O Linux diferencia maiúsculas e minúsculas. Use `Documents` com D maiúsculo.' },
+        { pattern: /^cd$/, message: '`cd` sozinho vai para o diretório home. Especifique a pasta: `cd Documents`.' },
       ],
       xp: 75,
     },
     {
       id: 'basics-drill-4',
-      prompt: 'Create a nested directory structure: `projects/src/components` — all at once, even if parent dirs don\'t exist.',
+      prompt: 'Crie uma estrutura de diretórios aninhada: `projects/src/components` — tudo de uma vez, mesmo que os diretórios pai não existam.',
       difficulty: 'medium',
       check: (cmd) => /^mkdir\s+-p\s+projects\/src\/components$/.test(cmd.trim()),
       expectedOutput: '',
-      hints: ['`mkdir` alone can\'t create nested dirs. You need a flag that creates parents too...', 'The flag is `-p` (parents).'],
+      hints: ['`mkdir` sozinho não cria diretórios aninhados. Você precisa de uma flag que cria os pais também...', 'A flag é `-p` (parents).'],
       feedbackRules: [
-        { pattern: /^mkdir\s+projects\/src\/components$/, message: 'This would fail because `projects/` doesn\'t exist yet! Use `-p` to create parents.' },
-        { pattern: /^mkdir\s+-p\s+projects$/, message: 'You\'re creating only `projects/`. The full path is `projects/src/components`.' },
+        { pattern: /^mkdir\s+projects\/src\/components$/, message: 'Isso falharia porque `projects/` ainda não existe! Use `-p` para criar os diretórios pai.' },
+        { pattern: /^mkdir\s+-p\s+projects$/, message: 'Você está criando apenas `projects/`. O caminho completo é `projects/src/components`.' },
       ],
       xp: 100,
     },
     {
       id: 'basics-drill-5',
-      prompt: 'List the contents of the current directory in long format, sorted by modification time (newest last), including hidden files.',
+      prompt: 'Liste o conteúdo do diretório atual em formato longo, ordenado por data de modificação (mais recente por último), incluindo arquivos ocultos.',
       difficulty: 'hard',
       check: (cmd) => {
         const trimmed = cmd.trim();
@@ -116,54 +116,54 @@ export const cliBasicsModule: Module = {
       },
       expectedOutput: '-rw-r--r-- 1 enzo enzo  807 Jan 01 00:00 .profile\n-rw-r--r-- 1 enzo enzo  220 Jan 01 00:00 .bashrc\ndrwxr-xr-x 2 enzo enzo 4096 Feb 28 11:00 Music\ndrwxr-xr-x 2 enzo enzo 4096 Mar 01 09:00 Desktop\ndrwxr-xr-x 3 enzo enzo 4096 Mar 01 16:45 Pictures\ndrwxr-xr-x 5 enzo enzo 4096 Mar 02 14:30 Documents\ndrwxr-xr-x 2 enzo enzo 4096 Mar 03 08:15 Downloads\ndrwxr-xr-x 2 enzo enzo 4096 Mar 03 10:00 scripts',
       hints: [
-        'You need 4 flags: long format, all files, sort by time, reverse order.',
-        'The flags are: `-l` (long) `-a` (all) `-t` (time sort) `-r` (reverse).',
+        'Você precisa de 4 flags: formato longo, todos os arquivos, ordenar por tempo, ordem reversa.',
+        'As flags são: `-l` (long) `-a` (all) `-t` (time sort) `-r` (reverse).',
       ],
       feedbackRules: [
-        { pattern: /^ls\s+-l$/, message: 'That\'s long format. Now add `-a` (all), `-t` (time), `-r` (reverse).' },
-        { pattern: /^ls\s+-la$/, message: 'Good, long + all! Add `-t` for time sort and `-r` for reverse.' },
-        { pattern: /^ls\s+-lat$/, message: 'Almost! Add `-r` to reverse the order (oldest first, newest last).' },
+        { pattern: /^ls\s+-l$/, message: 'Isso é o formato longo. Agora adicione `-a` (all), `-t` (time), `-r` (reverse).' },
+        { pattern: /^ls\s+-la$/, message: 'Bom, long + all! Adicione `-t` para ordenar por tempo e `-r` para inverter.' },
+        { pattern: /^ls\s+-lat$/, message: 'Quase! Adicione `-r` para inverter a ordem (mais antigo primeiro, mais recente por último).' },
       ],
       xp: 125,
     },
   ],
 
   boss: {
-    title: 'The Navigator',
-    scenario: 'You\'ve just SSH\'d into a new server. Orient yourself: find where you are, explore the file system, and set up your project workspace.',
+    title: 'O Navegador',
+    scenario: 'Você acabou de conectar via SSH em um novo servidor. Oriente-se: descubra onde você está, explore o sistema de arquivos e prepare seu workspace de projeto.',
     steps: [
       {
         id: 'boss-basics-1',
-        prompt: '> You\'ve just connected to the server. First things first — where are you?',
+        prompt: '> Você acabou de conectar no servidor. Primeiro de tudo — onde você está?',
         check: (cmd) => cmd.trim() === 'pwd',
         expectedOutput: '/home/enzo',
-        hints: ['Start with the basics. Print your working directory.'],
+        hints: ['Comece pelo básico. Mostre seu diretório de trabalho.'],
         feedbackRules: [],
       },
       {
         id: 'boss-basics-2',
-        prompt: '> Good, you\'re home. Now look around — what files and folders are here? Show ALL of them, including hidden ones, with full details.',
+        prompt: '> Boa, você está no home. Agora olhe ao redor — quais arquivos e pastas estão aqui? Mostre TODOS, incluindo os ocultos, com detalhes completos.',
         check: (cmd) => /^ls\s+/.test(cmd.trim()) && cmd.includes('l') && cmd.includes('a'),
         expectedOutput: 'total 40\ndrwxr-xr-x 8 enzo enzo 4096 Mar 03 10:00 .\ndrwxr-xr-x 3 root root 4096 Jan 01 00:00 ..\n-rw-r--r-- 1 enzo enzo  220 Jan 01 00:00 .bashrc\ndrwx------ 2 enzo enzo 4096 Mar 01 08:00 .ssh\ndrwxr-xr-x 2 enzo enzo 4096 Mar 01 09:00 Desktop\ndrwxr-xr-x 5 enzo enzo 4096 Mar 02 14:30 Documents\ndrwxr-xr-x 2 enzo enzo 4096 Mar 03 08:15 Downloads',
-        hints: ['Combine `-l` (long) and `-a` (all) flags.'],
+        hints: ['Combine as flags `-l` (long) e `-a` (all).'],
         feedbackRules: [
-          { pattern: /^ls$/, message: 'You need more detail! Add `-la` to see hidden files and permissions.' },
+          { pattern: /^ls$/, message: 'Você precisa de mais detalhes! Adicione `-la` para ver arquivos ocultos e permissões.' },
         ],
       },
       {
         id: 'boss-basics-3',
-        prompt: '> Time to set up your workspace. Create the directory structure: `projects/cli-quest/src` — all at once.',
+        prompt: '> Hora de montar seu workspace. Crie a estrutura de diretórios: `projects/cli-quest/src` — tudo de uma vez.',
         check: (cmd) => /^mkdir\s+-p\s+projects\/cli-quest\/src$/.test(cmd.trim()),
         expectedOutput: '',
-        hints: ['Remember `-p` for creating parent directories.'],
+        hints: ['Lembre-se do `-p` para criar diretórios pai.'],
         feedbackRules: [],
       },
       {
         id: 'boss-basics-4',
-        prompt: '> Now navigate into your new project directory.',
+        prompt: '> Agora navegue até o seu novo diretório de projeto.',
         check: (cmd) => /^cd\s+projects\/cli-quest(\/src)?\/?$/.test(cmd.trim()),
         expectedOutput: '',
-        hints: ['`cd` into the directory you just created.'],
+        hints: ['Use `cd` para entrar no diretório que você acabou de criar.'],
         feedbackRules: [],
       },
     ],

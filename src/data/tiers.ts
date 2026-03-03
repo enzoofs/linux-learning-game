@@ -1,10 +1,10 @@
 import type { Tier } from '../types';
 
 export const TIERS: Tier[] = [
-  { name: 'Recruit', color: '#6ee7b7', icon: '🔰', minXP: 0 },
-  { name: 'Operator', color: '#60a5fa', icon: '⚡', minXP: 400 },
-  { name: 'Specialist', color: '#c084fc', icon: '🎯', minXP: 900 },
-  { name: 'Commander', color: '#f97316', icon: '🏆', minXP: 1600 },
+  { name: 'Recruit', displayName: 'Recruta', color: '#6ee7b7', icon: '🔰', minXP: 0 },
+  { name: 'Operator', displayName: 'Operador', color: '#60a5fa', icon: '⚡', minXP: 400 },
+  { name: 'Specialist', displayName: 'Especialista', color: '#c084fc', icon: '🎯', minXP: 900 },
+  { name: 'Commander', displayName: 'Comandante', color: '#f97316', icon: '🏆', minXP: 1600 },
 ];
 
 export function getCurrentTier(xp: number): Tier {

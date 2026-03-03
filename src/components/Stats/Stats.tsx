@@ -29,19 +29,19 @@ export function Stats() {
 
   return (
     <div className="p-6 max-h-[70vh] overflow-y-auto">
-      <div className="text-sm text-slate-500 mb-6 font-semibold tracking-wider">YOUR STATS</div>
+      <div className="text-sm text-slate-500 mb-6 font-semibold tracking-wider">SUAS ESTATÍSTICAS</div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
         {[
-          { label: 'Total XP', value: totalXP.toLocaleString(), color: 'text-amber-400' },
-          { label: 'Modules', value: `${completedModules.length}/${ALL_MODULES.length}`, color: 'text-cyan-400' },
-          { label: 'Drills', value: `${completedDrills.length}/${totalDrills}`, color: 'text-green-400' },
+          { label: 'XP Total', value: totalXP.toLocaleString(), color: 'text-amber-400' },
+          { label: 'Módulos', value: `${completedModules.length}/${ALL_MODULES.length}`, color: 'text-cyan-400' },
+          { label: 'Exercícios', value: `${completedDrills.length}/${totalDrills}`, color: 'text-green-400' },
           { label: 'Bosses', value: completedBosses.length.toString(), color: 'text-orange-400' },
-          { label: 'Achievements', value: `${unlockedAchievements.length}/${ACHIEVEMENTS.length}`, color: 'text-purple-400' },
-          { label: 'Accuracy', value: `${accuracy}%`, color: 'text-emerald-400' },
-          { label: 'Current Streak', value: `${currentStreak}d`, color: 'text-red-400' },
-          { label: 'Best Streak', value: `${longestStreak}d`, color: 'text-rose-400' },
-          { label: 'Play Time', value: formatTime(totalPlayTimeMs), color: 'text-blue-400' },
+          { label: 'Conquistas', value: `${unlockedAchievements.length}/${ACHIEVEMENTS.length}`, color: 'text-purple-400' },
+          { label: 'Precisão', value: `${accuracy}%`, color: 'text-emerald-400' },
+          { label: 'Streak Atual', value: `${currentStreak}d`, color: 'text-red-400' },
+          { label: 'Melhor Streak', value: `${longestStreak}d`, color: 'text-rose-400' },
+          { label: 'Tempo de Jogo', value: formatTime(totalPlayTimeMs), color: 'text-blue-400' },
         ].map((stat) => (
           <div key={stat.label} className="bg-slate-900/40 rounded-lg p-3 border border-slate-700/30">
             <div className={`text-lg font-bold ${stat.color}`}>{stat.value}</div>
@@ -52,7 +52,7 @@ export function Stats() {
 
       {sortedCommands.length > 0 && (
         <div>
-          <div className="text-xs text-slate-500 font-semibold mb-3">TOP SANDBOX COMMANDS</div>
+          <div className="text-xs text-slate-500 font-semibold mb-3">COMANDOS MAIS USADOS NO SANDBOX</div>
           <div className="space-y-1">
             {sortedCommands.map(([cmd, count], i) => (
               <div key={cmd} className="flex items-center gap-3">
