@@ -2,8 +2,8 @@ import type { Module } from '../../types';
 
 export const dataWranglingModule: Module = {
   id: 'data-wrangling',
-  title: 'Data Wrangling',
-  description: 'Transform, sort, and analyze structured data with awk, cut, sort, and uniq.',
+  title: 'Manipulação de Dados',
+  description: 'Transforme, ordene e analise dados estruturados com awk, cut, sort e uniq.',
   tier: 'Specialist',
   prerequisites: ['pipes-streams'],
   isSideQuest: false,
