@@ -5,6 +5,25 @@ import { filesNavigationModule } from './files-navigation';
 import { processMgmtModule } from './process-mgmt';
 import { textProcessingModule } from './text-processing';
 import { dataWranglingModule } from './data-wrangling';
+// Secret Book modules
+import { sbShellTricksModule } from './sb-shell-tricks';
+import { sbShellFunctionsModule } from './sb-shell-functions';
+import { sbAdvancedFindModule } from './sb-advanced-find';
+import { sbPermissionsModule } from './sb-permissions';
+import { sbVimModule } from './sb-vim';
+import { sbTmuxModule } from './sb-tmux';
+import { sbCurlModule } from './sb-curl';
+import { sbSshModule } from './sb-ssh';
+import { sbDiskModule } from './sb-disk';
+import { sbNetworkingModule } from './sb-networking';
+import { sbGitModule } from './sb-git';
+import { sbMonitoringModule } from './sb-monitoring';
+import { sbCronModule } from './sb-cron';
+import { sbLogsModule } from './sb-logs';
+import { sbDockerModule } from './sb-docker';
+import { sbPackagesModule } from './sb-packages';
+import { sbOnelinersModule } from './sb-oneliners';
+import { sbHardeningModule } from './sb-hardening';
 
 export const ALL_MODULES: Module[] = [
   cliBasicsModule,
@@ -13,6 +32,25 @@ export const ALL_MODULES: Module[] = [
   processMgmtModule,
   textProcessingModule,
   dataWranglingModule,
+  // Secret Book modules
+  sbShellTricksModule,
+  sbShellFunctionsModule,
+  sbAdvancedFindModule,
+  sbPermissionsModule,
+  sbVimModule,
+  sbTmuxModule,
+  sbCurlModule,
+  sbSshModule,
+  sbDiskModule,
+  sbNetworkingModule,
+  sbGitModule,
+  sbMonitoringModule,
+  sbCronModule,
+  sbLogsModule,
+  sbDockerModule,
+  sbPackagesModule,
+  sbOnelinersModule,
+  sbHardeningModule,
 ];
 
 export function getModuleById(id: string): Module | undefined {
