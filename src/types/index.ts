@@ -180,6 +180,30 @@ export interface GameState {
   currentDrillIndex: number;
   currentBossStep: number;
   currentView: AppView;
+  // Shop & Avatar
+  lifetimeXP: number;
+  spendableXP: number;
+  ownedItems: string[];
+  equippedItems: Record<string, string>;
+  activeTheme: string | null;
+  powerUps: Record<string, number>;
 }
 
-export type AppView = 'terminal' | 'map' | 'journal' | 'achievements' | 'stats';
+export type AppView = 'terminal' | 'map' | 'shop' | 'journal' | 'achievements' | 'stats';
+
+export type ShopItemCategory = 'cosmetic' | 'theme' | 'powerup';
+export type EquipmentSlot = 'hat' | 'shirt' | 'face' | 'cape';
+
+export interface ShopItem {
+  id: string;
+  name: string;
+  description: string;
+  category: ShopItemCategory;
+  price: number;
+  minTier: TierName;
+  slot?: EquipmentSlot;
+  themeId?: string;
+  powerUpId?: string;
+  powerUpAmount?: number;
+  pixels?: [number, number, string][];
+}
