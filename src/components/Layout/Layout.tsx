@@ -11,6 +11,7 @@ interface LayoutProps {
 
 const NAV_TABS: { id: AppView; label: string }[] = [
   { id: 'terminal', label: '> Terminal' },
+  { id: 'sandbox', label: 'Sandbox' },
   { id: 'map', label: 'Árvore de Skills' },
   // { id: 'shop', label: 'Loja' },  // TODO: reativar quando a loja estiver pronta
   { id: 'journal', label: 'Diário' },
