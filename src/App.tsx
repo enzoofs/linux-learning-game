@@ -6,13 +6,14 @@ import { Achievements } from './components/Achievements/Achievements';
 import { Stats } from './components/Stats/Stats';
 import { Journal } from './components/Journal/Journal';
 import { Chat } from './components/Chat/Chat';
+import { Shop } from './components/Shop/Shop';
 import { useAchievementDetection } from './hooks/useAchievements';
 import { useGameStore } from './stores/gameStore';
 import { cliBasicsModule } from './data/modules/cli-basics';
 import { getModuleById } from './data/modules';
 import type { Module, AppView } from './types';
 
-const VALID_VIEWS: AppView[] = ['terminal', 'map', 'journal', 'achievements', 'stats'];
+const VALID_VIEWS: AppView[] = ['terminal', 'map', 'shop', 'journal', 'achievements', 'stats'];
 
 function resolveInitialView(): AppView {
   const saved = useGameStore.getState().currentView;
@@ -74,6 +75,7 @@ function App() {
             }
           }} />
         )}
+        {view === 'shop' && <Shop />}
         {view === 'journal' && <Journal />}
         {view === 'achievements' && <Achievements />}
         {view === 'stats' && <Stats />}
