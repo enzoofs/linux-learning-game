@@ -1,101 +1,118 @@
-import { useMemo } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { getItemById } from '../../data/shopItems';
-
-// Base character pixels: [x, y, color]
-// 16x16 pixel art humanoid
-const SKIN = '#fbbf24';
-const EYES = '#1e293b';
-const BODY = '#22d3ee';
-const PANTS = '#3b82f6';
-const SHOES = '#1e293b';
-const HAIR = '#92400e';
-
-const BASE_PIXELS: [number, number, string][] = [
-  // --- Hair (y=1) ---
-  [6, 1, HAIR], [7, 1, HAIR], [8, 1, HAIR], [9, 1, HAIR],
-
-  // --- Head top (y=2) ---
-  [5, 2, HAIR], [6, 2, SKIN], [7, 2, SKIN], [8, 2, SKIN], [9, 2, SKIN], [10, 2, HAIR],
-
-  // --- Head middle (y=3) - with eyes ---
-  [5, 3, SKIN], [6, 3, EYES], [7, 3, SKIN], [8, 3, SKIN], [9, 3, EYES], [10, 3, SKIN],
-
-  // --- Head lower (y=4) - mouth ---
-  [5, 4, SKIN], [6, 4, SKIN], [7, 4, SKIN], [8, 4, SKIN], [9, 4, SKIN], [10, 4, SKIN],
-
-  // --- Neck (y=5) ---
-  [7, 5, SKIN], [8, 5, SKIN],
-
-  // --- Body top / shoulders (y=6) ---
-  [4, 6, SKIN], [5, 6, BODY], [6, 6, BODY], [7, 6, BODY], [8, 6, BODY], [9, 6, BODY], [10, 6, BODY], [11, 6, SKIN],
-
-  // --- Body middle (y=7) ---
-  [4, 7, SKIN], [5, 7, BODY], [6, 7, BODY], [7, 7, BODY], [8, 7, BODY], [9, 7, BODY], [10, 7, BODY], [11, 7, SKIN],
-
-  // --- Body lower (y=8) ---
-  [4, 8, SKIN], [5, 8, BODY], [6, 8, BODY], [7, 8, BODY], [8, 8, BODY], [9, 8, BODY], [10, 8, BODY], [11, 8, SKIN],
-
-  // --- Belt / waist (y=9) ---
-  [5, 9, BODY], [6, 9, BODY], [7, 9, BODY], [8, 9, BODY], [9, 9, BODY], [10, 9, BODY],
-
-  // --- Legs top (y=10) ---
-  [6, 10, PANTS], [7, 10, PANTS], [8, 10, PANTS], [9, 10, PANTS],
-
-  // --- Legs middle (y=11) ---
-  [6, 11, PANTS], [7, 11, PANTS], [8, 11, PANTS], [9, 11, PANTS],
-
-  // --- Legs lower (y=12) ---
-  [6, 12, PANTS], [7, 12, PANTS], [8, 12, PANTS], [9, 12, PANTS],
-
-  // --- Feet (y=13) ---
-  [5, 13, SHOES], [6, 13, SHOES], [7, 13, SHOES], [9, 13, SHOES], [10, 13, SHOES], [11, 13, SHOES],
-];
+import { getItemById, getSpriteStyle, DEFAULT_CHARACTER_ROW, SPRITE_SHEETS } from '../../data/shopItems';
+import type { SpriteRef } from '../../types';
 
 interface PixelAvatarProps {
-  size?: number;
+  size?: number; // display size of the character in px (default 64)
   className?: string;
+  showSlots?: boolean; // show equipped item icons around avatar
 }
 
-export function PixelAvatar({ size = 4, className = '' }: PixelAvatarProps) {
-  const equippedItems = useGameStore((s) => s.equippedItems);
+const SLOT_LABELS: Record<string, string> = {
+  helmet: '🪖',
+  armor: '🛡️',
+  weapon: '⚔️',
+  accessory: '💎',
+};
 
-  const boxShadow = useMemo(() => {
-    const allPixels: [number, number, string][] = [...BASE_PIXELS];
-
-    // Overlay equipped items
-    for (const itemId of Object.values(equippedItems)) {
-      const item = getItemById(itemId);
-      if (item?.pixels) {
-        allPixels.push(...item.pixels);
-      }
-    }
-
-    return allPixels
-      .map(([x, y, color]) => `${x * size}px ${y * size}px 0 0 ${color}`)
-      .join(', ');
-  }, [equippedItems, size]);
-
+function SpriteIcon({ sprite, displaySize }: { sprite: SpriteRef; displaySize: number }) {
   return (
     <div
-      className={className}
-      style={{
-        width: 16 * size,
-        height: 16 * size,
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      <div
-        style={{
-          width: size,
-          height: size,
-          boxShadow,
-          position: 'absolute',
-          top: 0,
-          left: 0,
-        }}
-      />
+      style={getSpriteStyle(sprite.sheet, sprite.col, sprite.row, displaySize)}
+      className="flex-shrink-0"
+    />
+  );
+}
+
+export function PixelAvatar({ size = 64, className = '', showSlots = false }: PixelAvatarProps) {
+  const equippedItems = useGameStore((s) => s.equippedItems);
+
+  // Determine active character skin
+  const equippedSkin = equippedItems['skin'];
+  const skinItem = equippedSkin ? getItemById(equippedSkin) : null;
+  const charRow = skinItem?.characterRow ?? DEFAULT_CHARACTER_ROW;
+
+  // Character sprite: column 1 (front idle) of the chosen row
+  const charInfo = SPRITE_SHEETS.characters;
+  const charStyle = {
+    backgroundImage: `url(${import.meta.env.BASE_URL}sprites/${charInfo.file})`,
+    backgroundPosition: `-${1 * size}px -${charRow * size}px`,
+    backgroundSize: `${charInfo.cols * size}px ${charInfo.rows * size}px`,
+    width: size,
+    height: size,
+    imageRendering: 'pixelated' as const,
+  };
+
+  // Collect equipped item sprites for slots
+  const slotItems: { slot: string; sprite: SpriteRef }[] = [];
+  for (const [slot, itemId] of Object.entries(equippedItems)) {
+    if (slot === 'skin') continue;
+    const item = getItemById(itemId);
+    if (item?.sprite) {
+      slotItems.push({ slot, sprite: item.sprite });
+    }
+  }
+
+  const iconSize = Math.max(16, Math.round(size * 0.35));
+
+  if (!showSlots) {
+    // Compact mode: just the character
+    return <div className={className} style={charStyle} />;
+  }
+
+  // Full mode: character + equipment slots
+  return (
+    <div className={`inline-flex flex-col items-center gap-1 ${className}`}>
+      {/* Top slot: helmet */}
+      <div className="flex justify-center" style={{ height: iconSize }}>
+        {equippedItems['helmet'] ? (
+          (() => {
+            const item = getItemById(equippedItems['helmet']);
+            return item?.sprite ? <SpriteIcon sprite={item.sprite} displaySize={iconSize} /> : null;
+          })()
+        ) : (
+          <span className="text-slate-600 text-xs" style={{ fontSize: iconSize * 0.6 }}>{SLOT_LABELS.helmet}</span>
+        )}
+      </div>
+
+      {/* Middle row: weapon - character - accessory */}
+      <div className="flex items-center gap-1">
+        <div className="flex justify-center items-center" style={{ width: iconSize, height: iconSize }}>
+          {equippedItems['weapon'] ? (
+            (() => {
+              const item = getItemById(equippedItems['weapon']);
+              return item?.sprite ? <SpriteIcon sprite={item.sprite} displaySize={iconSize} /> : null;
+            })()
+          ) : (
+            <span className="text-slate-600" style={{ fontSize: iconSize * 0.6 }}>{SLOT_LABELS.weapon}</span>
+          )}
+        </div>
+
+        <div style={charStyle} />
+
+        <div className="flex justify-center items-center" style={{ width: iconSize, height: iconSize }}>
+          {equippedItems['accessory'] ? (
+            (() => {
+              const item = getItemById(equippedItems['accessory']);
+              return item?.sprite ? <SpriteIcon sprite={item.sprite} displaySize={iconSize} /> : null;
+            })()
+          ) : (
+            <span className="text-slate-600" style={{ fontSize: iconSize * 0.6 }}>{SLOT_LABELS.accessory}</span>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom slot: armor */}
+      <div className="flex justify-center" style={{ height: iconSize }}>
+        {equippedItems['armor'] ? (
+          (() => {
+            const item = getItemById(equippedItems['armor']);
+            return item?.sprite ? <SpriteIcon sprite={item.sprite} displaySize={iconSize} /> : null;
+          })()
+        ) : (
+          <span className="text-slate-600" style={{ fontSize: iconSize * 0.6 }}>{SLOT_LABELS.armor}</span>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,14 +1,15 @@
 import { useState, useCallback } from 'react';
 import type { ShopItem, ShopItemCategory } from '../../types';
 import { useGameStore } from '../../stores/gameStore';
-import { getItemsByCategory } from '../../data/shopItems';
+import { getItemsByCategory, getSpriteStyle, SPRITE_SHEETS } from '../../data/shopItems';
 import { TIERS } from '../../data/tiers';
 import { PixelAvatar } from '../Avatar/PixelAvatar';
 
 type TabKey = ShopItemCategory;
 
 const TABS: { key: TabKey; label: string }[] = [
-  { key: 'cosmetic', label: 'Cosmeticos' },
+  { key: 'skin', label: 'Skins' },
+  { key: 'cosmetic', label: 'Equipamento' },
   { key: 'theme', label: 'Temas' },
   { key: 'powerup', label: 'Power-ups' },
 ];
@@ -17,8 +18,37 @@ function getTierIndex(tierName: string): number {
   return TIERS.findIndex((t) => t.name === tierName);
 }
 
+/** Preview for character skins */
+function SkinPreview({ row, displaySize = 48 }: { row: number; displaySize?: number }) {
+  const info = SPRITE_SHEETS.characters;
+  return (
+    <div
+      style={{
+        backgroundImage: `url(${import.meta.env.BASE_URL}sprites/${info.file})`,
+        backgroundPosition: `-${1 * displaySize}px -${row * displaySize}px`,
+        backgroundSize: `${info.cols * displaySize}px ${info.rows * displaySize}px`,
+        width: displaySize,
+        height: displaySize,
+        imageRendering: 'pixelated',
+      }}
+      className="mx-auto"
+    />
+  );
+}
+
+/** Preview for equipment items (icons) */
+function ItemSpritePreview({ item, displaySize = 32 }: { item: ShopItem; displaySize?: number }) {
+  if (!item.sprite) return null;
+  return (
+    <div
+      style={getSpriteStyle(item.sprite.sheet, item.sprite.col, item.sprite.row, displaySize)}
+      className="mx-auto"
+    />
+  );
+}
+
 export function Shop() {
-  const [activeTab, setActiveTab] = useState<TabKey>('cosmetic');
+  const [activeTab, setActiveTab] = useState<TabKey>('skin');
   const [flashId, setFlashId] = useState<string | null>(null);
 
   const spendableXP = useGameStore((s) => s.spendableXP);
@@ -57,6 +87,17 @@ export function Shop() {
         return;
       }
 
+      // Skins use the 'skin' slot
+      if (item.category === 'skin') {
+        const isEquipped = equippedItems['skin'] === item.id;
+        if (isEquipped) {
+          unequipItem('skin');
+        } else {
+          equipItem('skin', item.id);
+        }
+        return;
+      }
+
       if (item.category === 'cosmetic' && item.slot) {
         const isEquipped = equippedItems[item.slot] === item.id;
         if (isEquipped) {
@@ -74,7 +115,6 @@ export function Shop() {
         }
       }
 
-      // Power-ups are always "buy again"
       if (item.category === 'powerup') {
         handleBuy(item);
       }
@@ -92,7 +132,6 @@ export function Shop() {
     const tierLocked = itemTierIndex > currentTierIndex;
     const cantAfford = spendableXP < item.price;
 
-    // Tier locked
     if (tierLocked) {
       const tierDisplay = TIERS[itemTierIndex]?.displayName ?? item.minTier;
       return {
@@ -102,64 +141,43 @@ export function Shop() {
       };
     }
 
-    // Power-up: always purchasable
     if (item.category === 'powerup') {
       return {
         label: 'Comprar',
         className: cantAfford
           ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
-          : 'bg-cyan-600 hover:bg-cyan-500 text-white',
+          : 'bg-cyan-600 hover:bg-cyan-500 text-white cursor-pointer',
         disabled: cantAfford,
       };
     }
 
-    // Theme
     if (item.category === 'theme') {
       if (owned && activeTheme === item.themeId) {
-        return {
-          label: 'Desativar',
-          className: 'bg-slate-600 hover:bg-slate-500 text-slate-200',
-          disabled: false,
-        };
+        return { label: 'Desativar', className: 'bg-slate-600 hover:bg-slate-500 text-slate-200 cursor-pointer', disabled: false };
       }
       if (owned) {
-        return {
-          label: 'Ativar',
-          className: 'bg-green-600 hover:bg-green-500 text-white',
-          disabled: false,
-        };
+        return { label: 'Ativar', className: 'bg-green-600 hover:bg-green-500 text-white cursor-pointer', disabled: false };
       }
       return {
         label: 'Comprar',
-        className: cantAfford
-          ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
-          : 'bg-cyan-600 hover:bg-cyan-500 text-white',
+        className: cantAfford ? 'bg-slate-700 text-slate-500 cursor-not-allowed' : 'bg-cyan-600 hover:bg-cyan-500 text-white cursor-pointer',
         disabled: cantAfford,
       };
     }
 
-    // Cosmetic
+    // Skin or cosmetic
     if (owned) {
-      const isEquipped = item.slot ? equippedItems[item.slot] === item.id : false;
+      const slot = item.category === 'skin' ? 'skin' : item.slot;
+      const isEquipped = slot ? equippedItems[slot] === item.id : false;
       if (isEquipped) {
-        return {
-          label: 'Desequipar',
-          className: 'bg-slate-600 hover:bg-slate-500 text-slate-200',
-          disabled: false,
-        };
+        return { label: 'Desequipar', className: 'bg-slate-600 hover:bg-slate-500 text-slate-200 cursor-pointer', disabled: false };
       }
-      return {
-        label: 'Equipar',
-        className: 'bg-green-600 hover:bg-green-500 text-white',
-        disabled: false,
-      };
+      return { label: 'Equipar', className: 'bg-green-600 hover:bg-green-500 text-white cursor-pointer', disabled: false };
     }
 
     return {
       label: 'Comprar',
-      className: cantAfford
-        ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
-        : 'bg-cyan-600 hover:bg-cyan-500 text-white',
+      className: cantAfford ? 'bg-slate-700 text-slate-500 cursor-not-allowed' : 'bg-cyan-600 hover:bg-cyan-500 text-white cursor-pointer',
       disabled: cantAfford,
     };
   }
@@ -168,7 +186,7 @@ export function Shop() {
     <div className="flex flex-col items-center gap-6 p-6 max-w-4xl mx-auto">
       {/* Avatar + XP balance */}
       <div className="flex flex-col items-center gap-3">
-        <PixelAvatar size={6} />
+        <PixelAvatar size={80} showSlots />
         <div className="flex items-center gap-2 text-lg font-bold text-amber-400">
           <span className="text-xl">🪙</span>
           <span>{spendableXP} XP</span>
@@ -181,7 +199,7 @@ export function Shop() {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
               activeTab === tab.key
                 ? 'bg-cyan-600 text-white'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
@@ -216,19 +234,39 @@ export function Shop() {
                 </span>
               )}
 
+              {/* Sprite preview */}
+              <div className="flex justify-center py-2">
+                {item.category === 'skin' && item.characterRow != null && (
+                  <SkinPreview row={item.characterRow} displaySize={48} />
+                )}
+                {item.category === 'cosmetic' && item.sprite && (
+                  <ItemSpritePreview item={item} displaySize={32} />
+                )}
+                {item.category === 'theme' && (
+                  <div className="w-12 h-12 rounded-lg bg-slate-900 flex items-center justify-center text-2xl">
+                    🎨
+                  </div>
+                )}
+                {item.category === 'powerup' && (
+                  <div className="w-12 h-12 rounded-lg bg-slate-900 flex items-center justify-center text-2xl">
+                    ⚡
+                  </div>
+                )}
+              </div>
+
               {/* Name & description */}
-              <h3 className="text-gray-200 font-semibold text-sm">{item.name}</h3>
-              <p className="text-slate-400 text-xs leading-relaxed">{item.description}</p>
+              <h3 className="text-gray-200 font-semibold text-sm text-center">{item.name}</h3>
+              <p className="text-slate-400 text-xs leading-relaxed text-center">{item.description}</p>
 
               {/* Power-up quantity */}
               {item.category === 'powerup' && item.powerUpId && (
-                <p className="text-xs text-amber-400">
+                <p className="text-xs text-amber-400 text-center">
                   Quantidade: {powerUps[item.powerUpId] ?? 0}
                 </p>
               )}
 
               {/* Price */}
-              <div className="flex items-center gap-1 mt-auto">
+              <div className="flex items-center justify-center gap-1 mt-auto">
                 <span className="text-sm">🪙</span>
                 <span
                   className={`text-sm font-mono font-bold ${
