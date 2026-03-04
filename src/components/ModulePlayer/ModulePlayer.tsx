@@ -411,10 +411,41 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
           terminal.addLine({ type: 'hint', text: 'Complete no Modo Desafio para desbloquear o próximo módulo!' });
         }
 
-        setTimeout(() => {
-          setPhase('completed');
-          onModuleComplete();
-        }, 3000);
+        // Check if all base modules are now complete — trigger Secret Book reveal
+        const BASE_MODULE_IDS = ['cli-basics', 'pipes-streams', 'files-nav', 'process-mgmt', 'text-processing', 'data-wrangling'];
+        const updatedCompleted = [...completedModules, module.id];
+        const allBaseComplete = BASE_MODULE_IDS.every(id => updatedCompleted.includes(id));
+        const storeState = useGameStore.getState();
+
+        if (allBaseComplete && !storeState.secretBookUnlocked) {
+          setTimeout(() => {
+            terminal.addLine({ type: 'system', text: '' });
+            terminal.addLine({ type: 'system', text: '> Todos os modulos completados...' });
+            setTimeout(() => {
+              terminal.addLine({ type: 'system', text: '> Desbloqueando conhecimento oculto...' });
+              setTimeout(() => {
+                terminal.addLine({ type: 'system', text: '> ################## 100%' });
+                setTimeout(() => {
+                  terminal.addLine({ type: 'levelup', text: 'THE SECRET BOOK OF KNOWLEDGE foi revelado!' });
+                  terminal.addLine({ type: 'learned', text: '"Ha mais no CLI do que voce imagina, jovem aprendiz..."' });
+                  terminal.addLine({ type: 'system', text: '' });
+                  terminal.addLine({ type: 'success', text: '18 novos modulos foram adicionados ao Mapa de Missoes!' });
+                  storeState.unlockSecretBook();
+                }, 800);
+              }, 600);
+            }, 600);
+          }, 4000);
+
+          setTimeout(() => {
+            setPhase('completed');
+            onModuleComplete();
+          }, 8000);
+        } else {
+          setTimeout(() => {
+            setPhase('completed');
+            onModuleComplete();
+          }, 3000);
+        }
       }
     } else if (result.type === 'feedback') {
       terminal.addLine({ type: 'feedback', text: result.message });
