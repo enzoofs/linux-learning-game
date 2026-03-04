@@ -2,7 +2,7 @@ import type { FSNode } from '../utils/virtualFS';
 
 // === Tiers & Progression ===
 
-export type TierName = 'Recruit' | 'Operator' | 'Specialist' | 'Commander';
+export type TierName = 'Recruit' | 'Operator' | 'Specialist' | 'Commander' | 'Initiate' | 'Adept' | 'Master' | 'GrandMaster';
 
 export interface Tier {
   name: TierName;
@@ -187,6 +187,7 @@ export interface GameState {
   equippedItems: Record<string, string>;
   activeTheme: string | null;
   powerUps: Record<string, number>;
+  secretBookUnlocked: boolean;
 }
 
 export type AppView = 'terminal' | 'map' | 'shop' | 'journal' | 'achievements' | 'stats';
