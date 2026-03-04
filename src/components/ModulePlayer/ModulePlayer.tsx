@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import type { Module, ModulePhase } from '../../types';
+import type { Module, ModulePhase, TerminalLine } from '../../types';
 import { Terminal } from '../Terminal/Terminal';
 import { Briefing } from '../Briefing/Briefing';
 import { useTerminal } from '../../hooks/useTerminal';
@@ -7,6 +7,8 @@ import { useGameStore } from '../../stores/gameStore';
 import { analyzeCommand } from '../../utils/commandParser';
 import { getLearnedCommands } from '../../data/modules';
 import { VirtualFS } from '../../utils/virtualFS';
+
+type GameMode = 'training' | 'challenge';
 
 const DIFFICULTY_LABELS: Record<string, string> = {
   easy: 'FÁCIL',
@@ -23,8 +25,10 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
   const store = useGameStore();
   const {
     addXP, completeDrill, completeModule, completeBoss, trackSandboxCommand,
-    addFreezeToken, setSession, clearSession,
+    addFreezeToken, setSession, clearSession, completedModules,
   } = store;
+
+  const isAlreadyCompleted = completedModules.includes(module.id);
 
   const [phase, setPhase] = useState<ModulePhase>(() => {
     const s = useGameStore.getState();
@@ -43,6 +47,10 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
   const [drillStartTime, setDrillStartTime] = useState(0);
   const [drillAttempts, setDrillAttempts] = useState(0);
   const [usedHint, setUsedHint] = useState(false);
+
+  // Game mode: training (can see brief) vs challenge (no brief, unlocks next module)
+  const [gameMode, setGameMode] = useState<GameMode>('training');
+  const [showBriefingOverlay, setShowBriefingOverlay] = useState(false);
 
   const terminal = useTerminal();
 
@@ -63,6 +71,12 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
   const currentDrill = module.drills[currentDrillIndex];
   const currentBoss = module.boss.steps[currentBossStep];
 
+  // Start in a specific mode
+  const handleStartMode = useCallback((mode: GameMode) => {
+    setGameMode(mode);
+    setPhase('sandbox');
+  }, []);
+
   // Initialize phase messages (guard against duplicate fires)
   const lastInitRef = useRef('');
 
@@ -72,19 +86,26 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     lastInitRef.current = key;
 
     if (phase === 'sandbox') {
+      const briefHint = gameMode === 'training'
+        ? "Digite 'done' quando estiver pronto para os desafios, ou 'brief' para revisar a explicação."
+        : "Digite 'done' quando estiver pronto para os desafios.";
       terminal.resetWithLines([
-        { type: 'system', text: '═══ MODO SANDBOX ═══' },
+        { type: 'system', text: `═══ MODO SANDBOX ${gameMode === 'challenge' ? '(DESAFIO)' : '(TREINO)'} ═══` },
         { type: 'brief', text: 'Experimente à vontade! Digite qualquer comando relacionado ao tema. Sem certo ou errado aqui.' },
-        { type: 'hint', text: "Digite 'done' quando estiver pronto para os desafios, ou 'brief' para revisar a explicação." },
+        { type: 'hint', text: briefHint },
       ]);
     } else if (phase === 'drill' && currentDrill) {
       setDrillStartTime(Date.now());
       setDrillAttempts(0);
       setUsedHint(false);
-      terminal.resetWithLines([
+      const lines: TerminalLine[] = [
         { type: 'system', text: `═══ EXERCÍCIO ${currentDrillIndex + 1}/${module.drills.length}: ${DIFFICULTY_LABELS[currentDrill.difficulty] || currentDrill.difficulty.toUpperCase()} ═══` },
         { type: 'brief', text: currentDrill.prompt },
-      ]);
+      ];
+      if (gameMode === 'training') {
+        lines.push({ type: 'hint', text: "Dica: digite 'brief' para consultar as instruções." });
+      }
+      terminal.resetWithLines(lines);
     } else if (phase === 'boss') {
       terminal.resetWithLines([
         { type: 'system', text: `═══ 🏆 DESAFIO BOSS: ${module.boss.title.toUpperCase()} ═══` },
@@ -94,6 +115,16 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       ]);
     }
   }, [phase, currentDrillIndex, currentBossStep]);
+
+  // Handle 'brief' command across all phases
+  const handleBriefCommand = useCallback((): boolean => {
+    if (gameMode === 'challenge') {
+      terminal.addLine({ type: 'system', text: 'Modo Desafio: instruções desativadas.' });
+      return true;
+    }
+    setShowBriefingOverlay(true);
+    return true;
+  }, [gameMode, terminal]);
 
   const handleSandboxSubmit = useCallback(() => {
     const cmd = terminal.inputValue.trim();
@@ -107,18 +138,25 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       return;
     }
     if (cmd === 'brief') {
-      setPhase('briefing');
+      if (gameMode === 'training') {
+        setPhase('briefing');
+      } else {
+        terminal.addLine({ type: 'system', text: 'Modo Desafio: instruções desativadas.' });
+      }
       terminal.setInputValue('');
       return;
     }
     if (cmd === 'help') {
-      terminal.addLine({ type: 'system', text: "Comandos: done (iniciar exercícios), brief (revisar explicação), help, clear" });
+      const helpText = gameMode === 'training'
+        ? "Comandos: done (iniciar exercícios), brief (revisar explicação), help, clear"
+        : "Comandos: done (iniciar exercícios), help, clear";
+      terminal.addLine({ type: 'system', text: helpText });
       terminal.setInputValue('');
       return;
     }
     if (cmd === 'clear') {
       terminal.resetWithLines([
-        { type: 'system', text: '═══ MODO SANDBOX ═══' },
+        { type: 'system', text: `═══ MODO SANDBOX ${gameMode === 'challenge' ? '(DESAFIO)' : '(TREINO)'} ═══` },
         { type: 'hint', text: "Digite 'done' quando estiver pronto." },
       ]);
       terminal.setInputValue('');
@@ -175,7 +213,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     }
 
     terminal.setInputValue('');
-  }, [terminal, module.sandbox.commands, trackSandboxCommand, updateCwd]);
+  }, [terminal, module.sandbox.commands, trackSandboxCommand, updateCwd, gameMode]);
 
   const handleDrillSubmit = useCallback(() => {
     const cmd = terminal.inputValue.trim();
@@ -183,6 +221,11 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
 
     terminal.addLine({ type: 'input', text: cmd });
 
+    if (cmd === 'brief') {
+      handleBriefCommand();
+      terminal.setInputValue('');
+      return;
+    }
     if (cmd === 'hint') {
       setUsedHint(true);
       const hintIndex = Math.min(drillAttempts, currentDrill.hints.length - 1);
@@ -191,7 +234,10 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       return;
     }
     if (cmd === 'help') {
-      terminal.addLine({ type: 'system', text: "Comandos: hint (pedir dica), skip (pular exercício), help" });
+      const helpText = gameMode === 'training'
+        ? "Comandos: hint (pedir dica), brief (ver instruções), skip (pular exercício), help"
+        : "Comandos: hint (pedir dica), skip (pular exercício), help";
+      terminal.addLine({ type: 'system', text: helpText });
       terminal.setInputValue('');
       return;
     }
@@ -279,7 +325,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     }
 
     terminal.setInputValue('');
-  }, [terminal, currentDrill, currentDrillIndex, drillAttempts, drillStartTime, usedHint, module, addXP, completeDrill, updateCwd]);
+  }, [terminal, currentDrill, currentDrillIndex, drillAttempts, drillStartTime, usedHint, module, addXP, completeDrill, updateCwd, handleBriefCommand, gameMode]);
 
   const handleBossSubmit = useCallback(() => {
     const cmd = terminal.inputValue.trim();
@@ -287,6 +333,11 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
 
     terminal.addLine({ type: 'input', text: cmd });
 
+    if (cmd === 'brief') {
+      handleBriefCommand();
+      terminal.setInputValue('');
+      return;
+    }
     if (cmd === 'hint') {
       const hintIndex = 0;
       terminal.addLine({ type: 'hint', text: `Hint: ${currentBoss.hints[hintIndex]}` });
@@ -313,13 +364,24 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
         // Boss complete!
         addXP(module.boss.xpReward);
         completeBoss(module.id);
-        completeModule(module.id);
+
+        // Only unlock next module in challenge mode (or if already completed)
+        if (gameMode === 'challenge' || isAlreadyCompleted) {
+          completeModule(module.id);
+        }
+
         addFreezeToken();
         clearSession();
         terminal.addLine({ type: 'system', text: '' });
         terminal.addLine({ type: 'levelup', text: `BOSS DERROTADO: ${module.boss.title}! +${module.boss.xpReward} XP` });
         terminal.addLine({ type: 'success', text: 'Ganhou 1 Token de Proteção de Streak!' });
-        terminal.addLine({ type: 'levelup', text: `MÓDULO COMPLETO: ${module.title}` });
+
+        if (gameMode === 'challenge' || isAlreadyCompleted) {
+          terminal.addLine({ type: 'levelup', text: `MÓDULO COMPLETO: ${module.title}` });
+        } else {
+          terminal.addLine({ type: 'levelup', text: `MÓDULO CONCLUÍDO (TREINO): ${module.title}` });
+          terminal.addLine({ type: 'hint', text: 'Complete no Modo Desafio para desbloquear o próximo módulo!' });
+        }
 
         setTimeout(() => {
           setPhase('completed');
@@ -359,7 +421,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     }
 
     terminal.setInputValue('');
-  }, [terminal, currentBoss, currentBossStep, module, addXP, completeBoss, completeModule, addFreezeToken, clearSession, onModuleComplete, updateCwd]);
+  }, [terminal, currentBoss, currentBossStep, module, addXP, completeBoss, completeModule, addFreezeToken, clearSession, onModuleComplete, updateCwd, handleBriefCommand, gameMode, isAlreadyCompleted]);
 
   const handleSubmit = useCallback(() => {
     if (phase === 'sandbox') handleSandboxSubmit();
@@ -367,11 +429,12 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     else if (phase === 'boss') handleBossSubmit();
   }, [phase, handleSandboxSubmit, handleDrillSubmit, handleBossSubmit]);
 
+  const modeLabel = gameMode === 'challenge' ? ' (Desafio)' : ' (Treino)';
   const phaseLabels: Record<ModulePhase, string> = {
     briefing: '📖 Explicação',
-    sandbox: '🧪 Sandbox',
-    drill: `⚔️ Exercício ${currentDrillIndex + 1}/${module.drills.length}`,
-    boss: '🏆 Desafio Boss',
+    sandbox: `🧪 Sandbox${modeLabel}`,
+    drill: `⚔️ Exercício ${currentDrillIndex + 1}/${module.drills.length}${modeLabel}`,
+    boss: `🏆 Desafio Boss${modeLabel}`,
     completed: '✅ Concluído',
   };
 
@@ -386,25 +449,40 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
         <Briefing
           title={module.title}
           briefing={module.briefing}
-          onContinue={() => setPhase('sandbox')}
+          onStartTraining={() => handleStartMode('training')}
+          onStartChallenge={() => handleStartMode('challenge')}
         />
       )}
 
       {(phase === 'sandbox' || phase === 'drill' || phase === 'boss') && (
-        <Terminal
-          lines={terminal.lines}
-          inputValue={terminal.inputValue}
-          onInputChange={terminal.setInputValue}
-          onSubmit={handleSubmit}
-          inputRef={terminal.inputRef}
-          endRef={terminal.endRef}
-          prompt={`enzo@linux ${cwdDisplay} $`}
-          placeholder={
-            phase === 'sandbox' ? "experimente à vontade... ('done' para continuar)"
-            : phase === 'boss' ? "resolva o desafio... ('hint' para ajuda)"
-            : "digite sua resposta... ('hint' para ajuda)"
-          }
-        />
+        <>
+          {/* Briefing overlay for training mode */}
+          {showBriefingOverlay && (
+            <div className="absolute inset-0 z-40 bg-[#0a0f1e]/95 overflow-y-auto">
+              <Briefing
+                title={module.title}
+                briefing={module.briefing}
+                isOverlay
+                onClose={() => setShowBriefingOverlay(false)}
+              />
+            </div>
+          )}
+
+          <Terminal
+            lines={terminal.lines}
+            inputValue={terminal.inputValue}
+            onInputChange={terminal.setInputValue}
+            onSubmit={handleSubmit}
+            inputRef={terminal.inputRef}
+            endRef={terminal.endRef}
+            prompt={`enzo@linux ${cwdDisplay} $`}
+            placeholder={
+              phase === 'sandbox' ? "experimente à vontade... ('done' para continuar)"
+              : phase === 'boss' ? "resolva o desafio... ('hint' para ajuda)"
+              : "digite sua resposta... ('hint' para ajuda)"
+            }
+          />
+        </>
       )}
 
       {phase === 'completed' && (
@@ -416,7 +494,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
             onClick={onModuleComplete}
             className="px-6 py-3 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg text-cyan-400 font-semibold text-sm transition-all cursor-pointer"
           >
-            Continuar para a Árvore de Skills →
+            Continuar para o Mapa de Missões →
           </button>
         </div>
       )}

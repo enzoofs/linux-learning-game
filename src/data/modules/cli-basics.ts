@@ -57,7 +57,7 @@ export const cliBasicsModule: Module = {
       difficulty: 'easy',
       check: (cmd) => cmd.trim() === 'pwd',
       expectedOutput: '/home/enzo',
-      hints: ['O comando tem 3 letras: p_d'],
+      hints: ['O comando tem 3 letras: p_d', 'Pense em "print working directory" — ele imprime o caminho completo de onde você está.'],
       feedbackRules: [
         { pattern: /^cwd$/i, message: '`cwd` não é um comando — tente `pwd` (print working directory).' },
         { pattern: /^where/i, message: 'No terminal, usamos `pwd` em vez de "where".' },
@@ -70,7 +70,7 @@ export const cliBasicsModule: Module = {
       difficulty: 'easy',
       check: (cmd) => /^ls\s+-a$/.test(cmd.trim()),
       expectedOutput: '.  ..  .bashrc  .profile  .ssh  Desktop  Documents  Downloads  Music  Pictures  scripts',
-      hints: ['Use `ls` com uma flag. Arquivos ocultos começam com `.` — a flag é `-a` (all).'],
+      hints: ['O comando `ls` aceita flags para mudar seu comportamento. Qual flag revela o que está escondido?', 'Arquivos ocultos começam com `.` — use a flag `-a` (all) junto com `ls`.'],
       feedbackRules: [
         { pattern: /^ls$/, message: 'Bom começo! Mas `ls` sozinho esconde dotfiles. Adicione `-a` para mostrar tudo.' },
         { pattern: /^ls\s+-l$/, message: '`-l` mostra o formato longo. Para ver arquivos ocultos, use `-a`.' },
@@ -84,7 +84,7 @@ export const cliBasicsModule: Module = {
       difficulty: 'medium',
       check: (cmd) => /^cd\s+Documents\/?$/.test(cmd.trim()),
       expectedOutput: '',
-      hints: ['Use `cd` seguido do nome do diretório.'],
+      hints: ['Use `cd` seguido do nome do diretório.', 'Atenção: no Linux, letras maiúsculas e minúsculas importam. O nome da pasta começa com "D".'],
       feedbackRules: [
         { pattern: /^cd\s+documents/i, message: 'Quase! O Linux diferencia maiúsculas e minúsculas. Use `Documents` com D maiúsculo.' },
         { pattern: /^cd$/, message: '`cd` sozinho vai para o diretório home. Especifique a pasta: `cd Documents`.' },
@@ -137,7 +137,7 @@ export const cliBasicsModule: Module = {
         prompt: '> Você acabou de conectar no servidor. Primeiro de tudo — onde você está?',
         check: (cmd) => cmd.trim() === 'pwd',
         expectedOutput: '/home/enzo',
-        hints: ['Comece pelo básico. Mostre seu diretório de trabalho.'],
+        hints: ['Comece pelo básico. Mostre seu diretório de trabalho.', 'O comando que mostra onde você está tem a ver com "print" + "working directory".'],
         feedbackRules: [],
       },
       {
@@ -145,7 +145,7 @@ export const cliBasicsModule: Module = {
         prompt: '> Boa, você está no home. Agora olhe ao redor — quais arquivos e pastas estão aqui? Mostre TODOS, incluindo os ocultos, com detalhes completos.',
         check: (cmd) => /^ls\s+/.test(cmd.trim()) && cmd.includes('l') && cmd.includes('a'),
         expectedOutput: 'total 40\ndrwxr-xr-x 8 enzo enzo 4096 Mar 03 10:00 .\ndrwxr-xr-x 3 root root 4096 Jan 01 00:00 ..\n-rw-r--r-- 1 enzo enzo  220 Jan 01 00:00 .bashrc\ndrwx------ 2 enzo enzo 4096 Mar 01 08:00 .ssh\ndrwxr-xr-x 2 enzo enzo 4096 Mar 01 09:00 Desktop\ndrwxr-xr-x 5 enzo enzo 4096 Mar 02 14:30 Documents\ndrwxr-xr-x 2 enzo enzo 4096 Mar 03 08:15 Downloads',
-        hints: ['Combine as flags `-l` (long) e `-a` (all).'],
+        hints: ['Você precisa de um comando que liste tudo com detalhes — incluindo o que está escondido.', 'Combine as flags `-l` (long) e `-a` (all) no comando `ls`.'],
         feedbackRules: [
           { pattern: /^ls$/, message: 'Você precisa de mais detalhes! Adicione `-la` para ver arquivos ocultos e permissões.' },
         ],
@@ -155,7 +155,7 @@ export const cliBasicsModule: Module = {
         prompt: '> Hora de montar seu workspace. Crie a estrutura de diretórios: `projects/cli-quest/src` — tudo de uma vez.',
         check: (cmd) => /^mkdir\s+-p\s+projects\/cli-quest\/src$/.test(cmd.trim()),
         expectedOutput: '',
-        hints: ['Lembre-se do `-p` para criar diretórios pai.'],
+        hints: ['O `mkdir` sozinho não consegue criar vários níveis de pastas. Existe uma flag que cria os diretórios intermediários automaticamente.', 'Use `mkdir` com a flag `-p` (parents) seguida do caminho completo `projects/cli-quest/src`.'],
         feedbackRules: [],
       },
       {
@@ -163,7 +163,7 @@ export const cliBasicsModule: Module = {
         prompt: '> Agora navegue até o seu novo diretório de projeto.',
         check: (cmd) => /^cd\s+projects\/cli-quest(\/src)?\/?$/.test(cmd.trim()),
         expectedOutput: '',
-        hints: ['Use `cd` para entrar no diretório que você acabou de criar.'],
+        hints: ['Use `cd` para entrar no diretório que você acabou de criar.', 'O caminho começa em `projects/` — navegue até `projects/cli-quest` ou `projects/cli-quest/src`.'],
         feedbackRules: [],
       },
     ],

@@ -165,7 +165,10 @@ export const dataWranglingModule: Module = {
         prompt: '> O time de vendas despejou nomes de produtos em sales.txt com toneladas de duplicatas. Ordene, conte quantas vezes cada produto aparece e mostre os mais vendidos primeiro.',
         check: (cmd) => /^sort\s+sales\.txt\s*\|\s*uniq\s+-c\s*\|\s*sort\s+-rn$/.test(cmd.trim()),
         expectedOutput: '      5 Widget\n      4 Gadget\n      2 Cable\n      2 Plug\n      2 Screen',
-        hints: ['Este é o clássico padrão de contagem de frequência: `sort | uniq -c | sort -rn`.'],
+        hints: [
+          'Este é o clássico padrão de contagem de frequência: `sort | uniq -c | sort -rn`.',
+          'São 3 passos em um pipeline: primeiro ordene o arquivo, depois conte as duplicatas com `uniq -c`, e por fim ordene numericamente em ordem decrescente.',
+        ],
         feedbackRules: [
           { pattern: /^cat\s+sales\.txt$/, message: 'Isso mostra a lista bruta. Para uma contagem de frequência ranqueada: `sort sales.txt | uniq -c | sort -rn`.' },
           { pattern: /^sort\s+sales\.txt$/, message: 'Bom começo! Agora passe por pipe para `uniq -c | sort -rn` para contar e ranquear.' },
@@ -177,7 +180,10 @@ export const dataWranglingModule: Module = {
         prompt: '> Widget é o mais vendido! Agora extraia a coluna de preços (coluna 3) do data.csv detalhado para ver a precificação.',
         check: (cmd) => /^cut\s+-d['"],['"]?\s+-f3\s+data\.csv$/.test(cmd.trim()),
         expectedOutput: '29.99\n49.99\n9.99\n79.99\n19.99\n29.99\n9.99\n49.99\n79.99\n19.99',
-        hints: ['Use `cut` com vírgula como delimitador para extrair o 3o campo: `cut -d\',\' -f3 data.csv`.'],
+        hints: [
+          'Use `cut` com vírgula como delimitador para extrair o 3o campo: `cut -d\',\' -f3 data.csv`.',
+          'O `cut` precisa de duas flags: `-d` para definir o separador de colunas (vírgula) e `-f` para indicar qual campo extrair (o terceiro).',
+        ],
         feedbackRules: [
           { pattern: /^cat\s+data\.csv$/, message: 'Isso mostra todas as colunas. Use `cut -d\',\' -f3 data.csv` para extrair apenas os preços.' },
           { pattern: /^awk\s/, message: 'awk funciona também! Mas tente `cut -d\',\' -f3 data.csv` para este passo.' },
