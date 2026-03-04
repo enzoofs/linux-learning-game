@@ -47,6 +47,10 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
   const [drillStartTime, setDrillStartTime] = useState(0);
   const [drillAttempts, setDrillAttempts] = useState(0);
   const [usedHint, setUsedHint] = useState(false);
+  const [xpBoostActive, setXpBoostActive] = useState(false);
+
+  // Hint Extra: track whether the offer has been shown so next 'hint' consumes the power-up
+  const hintExtraOfferedRef = useRef(false);
 
   // Game mode: training (can see brief) vs challenge (no brief, unlocks next module)
   const [gameMode, setGameMode] = useState<GameMode>('training');
@@ -98,6 +102,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       setDrillStartTime(Date.now());
       setDrillAttempts(0);
       setUsedHint(false);
+      hintExtraOfferedRef.current = false;
       const lines: TerminalLine[] = [
         { type: 'system', text: `═══ EXERCÍCIO ${currentDrillIndex + 1}/${module.drills.length}: ${DIFFICULTY_LABELS[currentDrill.difficulty] || currentDrill.difficulty.toUpperCase()} ═══` },
         { type: 'brief', text: currentDrill.prompt },
@@ -228,8 +233,28 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     }
     if (cmd === 'hint') {
       setUsedHint(true);
-      const hintIndex = Math.min(drillAttempts, currentDrill.hints.length - 1);
-      terminal.addLine({ type: 'hint', text: `Hint: ${currentDrill.hints[hintIndex]}` });
+      if (drillAttempts < currentDrill.hints.length) {
+        // Normal hints still available
+        const hintIndex = Math.min(drillAttempts, currentDrill.hints.length - 1);
+        terminal.addLine({ type: 'hint', text: `Hint: ${currentDrill.hints[hintIndex]}` });
+      } else if (hintExtraOfferedRef.current) {
+        // Player already saw the offer — consume the power-up
+        const ok = useGameStore.getState().usePowerUp('hint-extra');
+        if (ok) {
+          terminal.addLine({ type: 'hint', text: 'Hint Extra: Releia o prompt com atenção. O comando que você precisa foi explicado no briefing.' });
+        } else {
+          terminal.addLine({ type: 'system', text: 'Você não tem mais Hint Extra disponível.' });
+        }
+        hintExtraOfferedRef.current = false;
+      } else if (useGameStore.getState().powerUps['hint-extra'] > 0) {
+        // All normal hints used, offer Hint Extra
+        terminal.addLine({ type: 'hint', text: `Hint: ${currentDrill.hints[currentDrill.hints.length - 1]}` });
+        terminal.addLine({ type: 'system', text: "Suas dicas acabaram. Você tem Hint Extra! Digite 'hint' novamente para usar." });
+        hintExtraOfferedRef.current = true;
+      } else {
+        // No hints left, no power-up
+        terminal.addLine({ type: 'hint', text: `Hint: ${currentDrill.hints[currentDrill.hints.length - 1]}` });
+      }
       terminal.setInputValue('');
       return;
     }
@@ -263,9 +288,10 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       if (currentDrill.expectedOutput) {
         terminal.addLine({ type: 'output', text: currentDrill.expectedOutput });
       }
-      terminal.addLine({ type: 'success', text: `CORRETO! +${currentDrill.xp} XP` });
+      const drillXpAmount = xpBoostActive ? currentDrill.xp * 2 : currentDrill.xp;
+      terminal.addLine({ type: 'success', text: `CORRETO! +${drillXpAmount} XP${xpBoostActive ? ' (Boost x2!)' : ''}` });
 
-      addXP(currentDrill.xp);
+      addXP(drillXpAmount);
       completeDrill({
         drillId: currentDrill.id,
         moduleId: module.id,
@@ -277,8 +303,9 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       });
 
       if (!usedHint && drillAttempts === 0) {
-        terminal.addLine({ type: 'levelup', text: 'BÔNUS DE PRIMEIRA! +25 XP' });
-        addXP(25);
+        const bonusXp = xpBoostActive ? 50 : 25;
+        terminal.addLine({ type: 'levelup', text: `BÔNUS DE PRIMEIRA! +${bonusXp} XP${xpBoostActive ? ' (Boost x2!)' : ''}` });
+        addXP(bonusXp);
       }
 
       // Move to next drill or boss
@@ -325,7 +352,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     }
 
     terminal.setInputValue('');
-  }, [terminal, currentDrill, currentDrillIndex, drillAttempts, drillStartTime, usedHint, module, addXP, completeDrill, updateCwd, handleBriefCommand, gameMode]);
+  }, [terminal, currentDrill, currentDrillIndex, drillAttempts, drillStartTime, usedHint, module, addXP, completeDrill, updateCwd, handleBriefCommand, gameMode, xpBoostActive]);
 
   const handleBossSubmit = useCallback(() => {
     const cmd = terminal.inputValue.trim();
@@ -362,7 +389,8 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
         setCurrentBossStep(nextStep);
       } else {
         // Boss complete!
-        addXP(module.boss.xpReward);
+        const bossXpAmount = xpBoostActive ? module.boss.xpReward * 2 : module.boss.xpReward;
+        addXP(bossXpAmount);
         completeBoss(module.id);
 
         // Only unlock next module in challenge mode (or if already completed)
@@ -373,7 +401,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
         addFreezeToken();
         clearSession();
         terminal.addLine({ type: 'system', text: '' });
-        terminal.addLine({ type: 'levelup', text: `BOSS DERROTADO: ${module.boss.title}! +${module.boss.xpReward} XP` });
+        terminal.addLine({ type: 'levelup', text: `BOSS DERROTADO: ${module.boss.title}! +${bossXpAmount} XP${xpBoostActive ? ' (Boost x2!)' : ''}` });
         terminal.addLine({ type: 'success', text: 'Ganhou 1 Token de Proteção de Streak!' });
 
         if (gameMode === 'challenge' || isAlreadyCompleted) {
@@ -421,7 +449,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     }
 
     terminal.setInputValue('');
-  }, [terminal, currentBoss, currentBossStep, module, addXP, completeBoss, completeModule, addFreezeToken, clearSession, onModuleComplete, updateCwd, handleBriefCommand, gameMode, isAlreadyCompleted]);
+  }, [terminal, currentBoss, currentBossStep, module, addXP, completeBoss, completeModule, addFreezeToken, clearSession, onModuleComplete, updateCwd, handleBriefCommand, gameMode, isAlreadyCompleted, xpBoostActive]);
 
   const handleSubmit = useCallback(() => {
     if (phase === 'sandbox') handleSandboxSubmit();
@@ -446,12 +474,42 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       </div>
 
       {phase === 'briefing' && (
-        <Briefing
-          title={module.title}
-          briefing={module.briefing}
-          onStartTraining={() => handleStartMode('training')}
-          onStartChallenge={() => handleStartMode('challenge')}
-        />
+        <>
+          <Briefing
+            title={module.title}
+            briefing={module.briefing}
+            onStartTraining={() => handleStartMode('training')}
+            onStartChallenge={() => handleStartMode('challenge')}
+          />
+          {/* XP Boost power-up activation */}
+          {(() => {
+            const boostCount = useGameStore.getState().powerUps['xp-boost'] ?? 0;
+            if (xpBoostActive) {
+              return (
+                <div className="mx-4 mb-4 px-3 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-center">
+                  <span className="text-amber-400 text-sm font-semibold">Boost x2 XP ativo!</span>
+                </div>
+              );
+            }
+            if (boostCount > 0) {
+              return (
+                <div className="mx-4 mb-4 px-3 py-2 bg-purple-500/10 border border-purple-500/30 rounded-lg text-center">
+                  <span className="text-purple-300 text-xs">Você tem {boostCount} XP Boost</span>
+                  <button
+                    onClick={() => {
+                      const ok = useGameStore.getState().usePowerUp('xp-boost');
+                      if (ok) setXpBoostActive(true);
+                    }}
+                    className="ml-3 px-3 py-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 rounded text-amber-400 text-xs font-semibold cursor-pointer transition-all"
+                  >
+                    Ativar Boost x2
+                  </button>
+                </div>
+              );
+            }
+            return null;
+          })()}
+        </>
       )}
 
       {(phase === 'sandbox' || phase === 'drill' || phase === 'boss') && (
