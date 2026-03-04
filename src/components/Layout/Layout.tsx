@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { PixelAvatar } from '../Avatar/PixelAvatar';
+// import { PixelAvatar } from '../Avatar/PixelAvatar';  // TODO: reativar com a loja
 import type { AppView } from '../../types';
 
 interface LayoutProps {
@@ -12,14 +12,14 @@ interface LayoutProps {
 const NAV_TABS: { id: AppView; label: string }[] = [
   { id: 'terminal', label: '> Terminal' },
   { id: 'map', label: 'Árvore de Skills' },
-  { id: 'shop', label: 'Loja' },
+  // { id: 'shop', label: 'Loja' },  // TODO: reativar quando a loja estiver pronta
   { id: 'journal', label: 'Diário' },
   { id: 'achievements', label: 'Conquistas' },
   { id: 'stats', label: 'Estatísticas' },
 ];
 
 export function Layout({ currentView, onViewChange, children }: LayoutProps) {
-  const { totalXP, lifetimeXP, spendableXP, getCurrentTier, getNextTier, currentStreak } = useGameStore();
+  const { totalXP, lifetimeXP, getCurrentTier, getNextTier, currentStreak } = useGameStore();
   const tier = getCurrentTier();
   const nextTier = getNextTier();
   const xp = lifetimeXP || totalXP;
@@ -61,10 +61,10 @@ export function Layout({ currentView, onViewChange, children }: LayoutProps) {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <PixelAvatar size={32} />
+                {/* TODO: reativar avatar quando a loja estiver pronta */}
+                {/* <PixelAvatar size={32} /> */}
                 <div>
                   <div className="text-amber-400 text-sm font-semibold">{lifetimeXP || totalXP} XP</div>
-                  <div className="text-[10px] text-slate-500">{spendableXP ?? totalXP} disponível</div>
                 </div>
               </div>
             </div>
