@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { GameState, DrillAttempt, Tier, ModulePhase, AppView } from '../types';
+import type { GameState, DrillAttempt, Tier, ModulePhase, AppView, ShopItem } from '../types';
 import { getCurrentTier, getNextTier } from '../data/tiers';
 import { saveState, loadState, clearState } from '../utils/persistence';
 
@@ -20,6 +20,11 @@ interface GameActions {
   setSession: (moduleId: string, phase: ModulePhase, drillIndex: number, bossStep: number) => void;
   setCurrentView: (view: AppView) => void;
   clearSession: () => void;
+  buyItem: (item: ShopItem) => boolean;
+  equipItem: (slot: string, itemId: string) => void;
+  unequipItem: (slot: string) => void;
+  setTheme: (themeId: string | null) => void;
+  usePowerUp: (powerUpId: string) => boolean;
   reset: () => void;
 }
 
@@ -42,6 +47,13 @@ const DEFAULT_STATE: GameState = {
   currentDrillIndex: 0,
   currentBossStep: 0,
   currentView: 'terminal',
+  // Shop & Avatar
+  lifetimeXP: 0,
+  spendableXP: 0,
+  ownedItems: [],
+  equippedItems: {},
+  activeTheme: null,
+  powerUps: {},
 };
 
 export const useGameStore = create<GameState & GameActions>()((set, get) => ({
@@ -50,7 +62,12 @@ export const useGameStore = create<GameState & GameActions>()((set, get) => ({
   addXP: (amount) =>
     set((s) => {
       const multiplier = get().getXpMultiplier();
-      return { totalXP: s.totalXP + Math.round(amount * multiplier) };
+      const gained = Math.round(amount * multiplier);
+      return {
+        totalXP: s.totalXP + gained,
+        lifetimeXP: s.lifetimeXP + gained,
+        spendableXP: s.spendableXP + gained,
+      };
     }),
 
   completeDrill: (attempt) =>
@@ -140,9 +157,9 @@ export const useGameStore = create<GameState & GameActions>()((set, get) => ({
     return prerequisites.every((p) => completedModules.includes(p));
   },
 
-  getCurrentTier: () => getCurrentTier(get().totalXP),
+  getCurrentTier: () => getCurrentTier(get().lifetimeXP || get().totalXP),
 
-  getNextTier: () => getNextTier(get().totalXP),
+  getNextTier: () => getNextTier(get().lifetimeXP || get().totalXP),
 
   getXpMultiplier: () => {
     const streak = get().currentStreak;
@@ -171,11 +188,65 @@ export const useGameStore = create<GameState & GameActions>()((set, get) => ({
       currentView: 'terminal',
     }),
 
+  buyItem: (item) => {
+    const state = get();
+    if (state.spendableXP < item.price) return false;
+    if (state.ownedItems.includes(item.id)) return false;
+    set((s) => ({
+      spendableXP: s.spendableXP - item.price,
+      ownedItems: [...s.ownedItems, item.id],
+      ...(item.category === 'powerup' && item.powerUpId
+        ? {
+            powerUps: {
+              ...s.powerUps,
+              [item.powerUpId]: (s.powerUps[item.powerUpId] || 0) + (item.powerUpAmount || 1),
+            },
+          }
+        : {}),
+    }));
+    return true;
+  },
+
+  equipItem: (slot, itemId) =>
+    set((s) => ({
+      equippedItems: { ...s.equippedItems, [slot]: itemId },
+    })),
+
+  unequipItem: (slot) =>
+    set((s) => {
+      const { [slot]: _, ...rest } = s.equippedItems;
+      return { equippedItems: rest };
+    }),
+
+  setTheme: (themeId) =>
+    set({ activeTheme: themeId }),
+
+  usePowerUp: (powerUpId) => {
+    const state = get();
+    if (!state.powerUps[powerUpId] || state.powerUps[powerUpId] <= 0) return false;
+    set((s) => ({
+      powerUps: {
+        ...s.powerUps,
+        [powerUpId]: s.powerUps[powerUpId] - 1,
+      },
+    }));
+    return true;
+  },
+
   reset: () => {
     clearState();
     set(DEFAULT_STATE);
   },
 }));
+
+// Migration: backfill lifetimeXP/spendableXP from totalXP for existing saves
+const initialState = useGameStore.getState();
+if (initialState.lifetimeXP === 0 && initialState.totalXP > 0) {
+  useGameStore.setState({
+    lifetimeXP: initialState.totalXP,
+    spendableXP: initialState.totalXP,
+  });
+}
 
 // Auto-save on state change (debounced)
 let saveTimeout: ReturnType<typeof setTimeout>;
@@ -199,6 +270,11 @@ useGameStore.subscribe((state) => {
       setSession,
       setCurrentView,
       clearSession,
+      buyItem,
+      equipItem,
+      unequipItem,
+      setTheme,
+      usePowerUp,
       reset,
       ...data
     } = state;
