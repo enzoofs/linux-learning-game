@@ -61,7 +61,7 @@ export function Layout({ currentView, onViewChange, children }: LayoutProps) {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <PixelAvatar size={3} />
+                <PixelAvatar size={32} />
                 <div>
                   <div className="text-amber-400 text-sm font-semibold">{lifetimeXP || totalXP} XP</div>
                   <div className="text-[10px] text-slate-500">{spendableXP ?? totalXP} disponível</div>

@@ -191,8 +191,14 @@ export interface GameState {
 
 export type AppView = 'terminal' | 'map' | 'shop' | 'journal' | 'achievements' | 'stats';
 
-export type ShopItemCategory = 'cosmetic' | 'theme' | 'powerup';
-export type EquipmentSlot = 'hat' | 'shirt' | 'face' | 'cape';
+export type ShopItemCategory = 'skin' | 'cosmetic' | 'theme' | 'powerup';
+export type EquipmentSlot = 'helmet' | 'armor' | 'weapon' | 'accessory';
+
+export interface SpriteRef {
+  sheet: 'characters' | 'armours' | 'weapons' | 'potions' | 'consumables' | 'books';
+  col: number;
+  row: number;
+}
 
 export interface ShopItem {
   id: string;
@@ -205,5 +211,7 @@ export interface ShopItem {
   themeId?: string;
   powerUpId?: string;
   powerUpAmount?: number;
-  pixels?: [number, number, string][];
+  sprite?: SpriteRef;
+  /** For skins: row index in the character sprite sheet */
+  characterRow?: number;
 }
