@@ -75,6 +75,7 @@ export const processMgmtModule: Module = {
       expectedOutput: '  PID TTY          TIME CMD\n 1234 pts/0    00:00:00 bash\n 5678 pts/0    00:00:00 ps',
       hints: [
         'O comando tem apenas duas letras. Significa "process status".',
+        'Sem nenhuma flag adicional, esse comando mostra apenas os processos do seu terminal atual. Tente digitá-lo sozinho.',
       ],
       feedbackRules: [
         { pattern: /^ps\s+aux/, message: 'Isso mostra TODOS os processos do sistema. Para apenas os do seu terminal, `ps` sozinho basta.' },
@@ -151,7 +152,10 @@ export const processMgmtModule: Module = {
         prompt: '> Os alarmes estão disparando! O servidor está lento. Primeiro, obtenha uma visão completa de todos os processos em execução para ver o que está consumindo recursos.',
         check: (cmd) => /^ps\s+aux$/.test(cmd.trim()) || cmd.trim() === 'top',
         expectedOutput: 'USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND\nroot         1  0.0  0.1 169316 11892 ?        Ss   09:00   0:03 /sbin/init\nroot        42  0.0  0.0  34568  2704 ?        Ss   09:00   0:00 /usr/sbin/cron\nwww-data   110  0.2  1.5 298764 12340 ?        S    09:01   0:15 /usr/sbin/apache2\nenzo      1234  0.0  0.0  21472  5204 pts/0    Ss   10:00   0:00 bash\nenzo      2345  0.5  2.1 156432 17200 ?        S    10:05   0:30 node server.js\nroot      3456  0.0  0.3  45672  2508 ?        Ss   09:00   0:01 /usr/sbin/sshd\nenzo      4523 99.0  5.2 312456 42000 ?        R    10:15   5:42 python train.py\nenzo      5678  0.0  0.0  18340  1200 pts/0    R+   10:30   0:00 ps aux',
-        hints: ['Use `ps aux` ou `top` para ver todos os processos com uso de recursos.'],
+        hints: [
+          'Você precisa de uma visão geral de tudo que está rodando no sistema, incluindo uso de CPU e memória.',
+          'Existem duas opções: um snapshot completo com `ps` e flags para todos os usuários, ou um monitor ao vivo que começa com a letra "t".',
+        ],
         feedbackRules: [
           { pattern: /^ps$/, message: '`ps` sozinho só mostra os processos do seu terminal. Use `ps aux` para ver TODOS os processos e o uso de CPU.' },
           { pattern: /^ls/, message: '`ls` lista arquivos. Para ver processos em execução, use `ps aux`.' },
@@ -162,7 +166,10 @@ export const processMgmtModule: Module = {
         prompt: '> Dá pra ver algo usando 99% de CPU! É um processo python. Vamos dar zoom — filtre a lista de processos para mostrar apenas os processos python.',
         check: (cmd) => /^ps\s+aux\s*\|\s*grep\s+['"]?python['"]?$/.test(cmd.trim()),
         expectedOutput: 'enzo      4523 99.0  5.2 312456 42000 ?        R    10:15   5:42 python train.py\nenzo      5679  0.0  0.0  12340   540 pts/0    S+   10:30   0:00 grep python',
-        hints: ['Passe `ps aux` por pipe para `grep python` para isolar os processos python.'],
+        hints: [
+          'Você precisa combinar um comando que lista todos os processos com outro que filtra linhas por texto. O operador pipe (|) conecta os dois.',
+          'O primeiro comando é o mesmo que você usou no passo anterior. O segundo comando é o `grep`, passando o nome do programa que você quer encontrar.',
+        ],
         feedbackRules: [
           { pattern: /^grep\s+['"]?python['"]?\s*$/, message: '`grep` precisa de entrada! Passe por pipe do `ps aux`: `ps aux | grep python`.' },
           { pattern: /^ps\s+aux$/, message: 'Isso mostra tudo. Filtre: `ps aux | grep python`.' },
@@ -173,7 +180,10 @@ export const processMgmtModule: Module = {
         prompt: '> Encontrei! PID 4523 — `python train.py` — é o culpado com 99% de CPU. Termine-o agora!',
         check: (cmd) => /^kill\s+(-9\s+)?4523$/.test(cmd.trim()),
         expectedOutput: '',
-        hints: ['Use `kill 4523` para enviar um sinal de terminação. Se não responder, use `kill -9 4523`.'],
+        hints: [
+          'Para terminar um processo, você precisa do comando de terminação seguido do número identificador (PID) do processo alvo.',
+          'O comando `kill` envia um sinal para o processo. Primeiro tente sem flags (sinal TERM). Se precisar forçar, a flag `-9` envia o sinal KILL.',
+        ],
         feedbackRules: [
           { pattern: /^kill\s+python/i, message: 'Você precisa matar pelo PID, não pelo nome. O PID é 4523: `kill 4523`.' },
           { pattern: /^kill$/, message: 'Especifique o PID! O processo problemático é o PID 4523: `kill 4523`.' },

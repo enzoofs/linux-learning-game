@@ -182,7 +182,10 @@ export const textProcessingModule: Module = {
         prompt: '> O app está logando dados sensíveis porque o modo debug está ligado. Primeiro, encontre todas as linhas em app.conf que tenham \'debug=true\'.',
         check: (cmd) => /^grep\s+['"]?debug=true['"]?\s+app\.conf$/.test(cmd.trim()),
         expectedOutput: 'debug=true\ndebug=true\ndebug=true',
-        hints: ['Use `grep` para buscar o padrão no arquivo de config.'],
+        hints: [
+          'Use `grep` para buscar o padrão no arquivo de config.',
+          'Busque exatamente a string `debug=true` dentro de `app.conf` usando `grep`.',
+        ],
         feedbackRules: [
           { pattern: /^cat\s+app\.conf$/, message: 'Isso mostra o arquivo inteiro. Use `grep \'debug=true\' app.conf` para encontrar só as linhas problemáticas.' },
           { pattern: /^grep\s+['"]?debug['"]?\s+app\.conf$/, message: 'Isso encontra qualquer linha com "debug". Seja mais específico: `grep \'debug=true\' app.conf`.' },
@@ -193,7 +196,10 @@ export const textProcessingModule: Module = {
         prompt: '> 3 ocorrências de debug=true! Corrija todas de uma vez — substitua todo \'debug=true\' por \'debug=false\' usando sed.',
         check: (cmd) => /^sed\s+'s\/debug=true\/debug=false\/g'\s+app\.conf$/.test(cmd.trim()),
         expectedOutput: 'app_name=myapp\ndebug=false\nlog_level=info\nmax_connections=100\ndebug=false\nport=8080\ncache_enabled=false\ndebug=false\ntimeout=30',
-        hints: ['Use `sed` com o comando substitute: `sed \'s/old/new/g\' file`.'],
+        hints: [
+          'Use `sed` com o comando substitute: `sed \'s/old/new/g\' file`.',
+          'Substitua `debug=true` por `debug=false`. Não esqueça do `g` no final para pegar todas as ocorrências.',
+        ],
         feedbackRules: [
           { pattern: /^sed\s+'s\/debug=true\/debug=false\/'\s+app\.conf$/, message: 'Sem a flag `g`, apenas uma ocorrência por linha é substituída. Adicione `g`: `sed \'s/debug=true/debug=false/g\' app.conf`.' },
           { pattern: /^grep/, message: '`grep` encontra texto mas não consegue substituir. Use `sed` para buscar e substituir.' },
@@ -204,7 +210,10 @@ export const textProcessingModule: Module = {
         prompt: '> Agora verifique a correção. Busque em app.conf por linhas \'debug\' restantes para confirmar que todas dizem \'false\'.',
         check: (cmd) => /^grep\s+['"]?debug['"]?\s+app\.conf$/.test(cmd.trim()),
         expectedOutput: 'debug=false\ndebug=false\ndebug=false',
-        hints: ['Busque por "debug" no config para ver todas as configurações relacionadas a debug.'],
+        hints: [
+          'Busque por "debug" no config para ver todas as configurações relacionadas a debug.',
+          'Use `grep` com apenas a palavra "debug" (sem especificar o valor) para capturar qualquer linha de debug, independente de ser true ou false.',
+        ],
         feedbackRules: [
           { pattern: /^cat\s+app\.conf$/, message: 'Isso mostra o arquivo inteiro. Use `grep \'debug\' app.conf` para ver só as configurações de debug.' },
           { pattern: /^grep\s+['"]?debug=true['"]?\s+app\.conf$/, message: 'Buscar "debug=true" não mostraria nada se a correção funcionou. Busque apenas "debug" para ver todas as linhas de debug.' },

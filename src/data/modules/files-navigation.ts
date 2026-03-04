@@ -162,7 +162,10 @@ export const filesNavigationModule: Module = {
         prompt: '> Primeiro, vamos avaliar o estrago. Encontre todos os arquivos .tmp no projeto para saber com o que estamos lidando.',
         check: (cmd) => /^find\s+\.\s+-name\s+['"][*]\.tmp['"]$/.test(cmd.trim()),
         expectedOutput: './cache/session.tmp\n./cache/data.tmp\n./tmp/upload.tmp\n./old.tmp',
-        hints: ['Use `find` com `-name` para localizar todos os arquivos .tmp.'],
+        hints: [
+          'Use `find` com `-name` para localizar todos os arquivos .tmp.',
+          'Comece a busca a partir do diretório atual (`.`) e use um padrão com wildcard entre aspas para capturar a extensão desejada.',
+        ],
         feedbackRules: [
           { pattern: /^ls\s+.*\.tmp/, message: '`ls` só olha no diretório atual. Use `find . -name "*.tmp"` para buscar em todo lugar.' },
           { pattern: /^find\s+\.\s+-name\s+[*]\.tmp$/, message: 'Lembre de colocar aspas no padrão! Use `find . -name "*.tmp"` com aspas em *.tmp.' },
@@ -173,7 +176,10 @@ export const filesNavigationModule: Module = {
         prompt: '> 4 arquivos temporários encontrados! Vamos nos livrar de todos. Delete todos os arquivos .tmp em um único comando.',
         check: (cmd) => /^find\s+\.\s+-name\s+['"][*]\.tmp['"]\s+-delete$/.test(cmd.trim()),
         expectedOutput: '',
-        hints: ['Adicione `-delete` ao seu comando find.'],
+        hints: [
+          'Adicione `-delete` ao seu comando find.',
+          'O `find` aceita ações no final do comando. Monte primeiro a busca por nome e depois encadeie a ação de remoção como último argumento.',
+        ],
         feedbackRules: [
           { pattern: /^rm\s/, message: '`rm` não consegue encontrar arquivos recursivamente. Use `find . -name "*.tmp" -delete`.' },
           { pattern: /^find\s+\.\s+-name\s+['"][*]\.tmp['"]$/, message: 'Isso encontra eles mas não deleta! Adicione `-delete` no final.' },
@@ -184,7 +190,10 @@ export const filesNavigationModule: Module = {
         prompt: '> Ótimo, os temporários foram embora. Agora o time precisa restaurar o config de backup. Copie config.bak para config.txt.',
         check: (cmd) => /^cp\s+config\.bak\s+config\.txt$/.test(cmd.trim()),
         expectedOutput: '',
-        hints: ['Use `cp` para copiar: `cp origem destino`.'],
+        hints: [
+          'Use `cp` para copiar: `cp origem destino`.',
+          'A ordem dos argumentos importa: o primeiro é o arquivo de origem (o backup) e o segundo é o destino onde será criada a cópia.',
+        ],
         feedbackRules: [
           { pattern: /^mv\s+config\.bak\s+config\.txt$/, message: '`mv` apagaria o backup! Use `cp` para fazer uma cópia e manter o original.' },
           { pattern: /^cp\s+config\.txt\s+config\.bak$/, message: 'Está invertido! Você quer copiar DE config.bak PARA config.txt.' },
