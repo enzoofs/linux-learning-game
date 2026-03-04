@@ -191,19 +191,23 @@ export const useGameStore = create<GameState & GameActions>()((set, get) => ({
   buyItem: (item) => {
     const state = get();
     if (state.spendableXP < item.price) return false;
-    if (state.ownedItems.includes(item.id)) return false;
-    set((s) => ({
-      spendableXP: s.spendableXP - item.price,
-      ownedItems: [...s.ownedItems, item.id],
-      ...(item.category === 'powerup' && item.powerUpId
-        ? {
-            powerUps: {
-              ...s.powerUps,
-              [item.powerUpId]: (s.powerUps[item.powerUpId] || 0) + (item.powerUpAmount || 1),
-            },
-          }
-        : {}),
-    }));
+    // Power-ups can be re-purchased; other items only once
+    if (item.category !== 'powerup' && state.ownedItems.includes(item.id)) return false;
+
+    if (item.category === 'powerup' && item.powerUpId) {
+      set((s) => ({
+        spendableXP: s.spendableXP - item.price,
+        powerUps: {
+          ...s.powerUps,
+          [item.powerUpId!]: (s.powerUps[item.powerUpId!] || 0) + (item.powerUpAmount || 1),
+        },
+      }));
+    } else {
+      set((s) => ({
+        spendableXP: s.spendableXP - item.price,
+        ownedItems: [...s.ownedItems, item.id],
+      }));
+    }
     return true;
   },
 
