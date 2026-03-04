@@ -38,7 +38,9 @@ const PLACEHOLDER_NAMES: Record<string, string> = {
 };
 
 export function MissionMap({ onSelectModule }: MissionMapProps) {
-  const { completedModules, isModuleUnlocked } = useGameStore();
+  const { completedModules, isModuleUnlocked, secretBookUnlocked } = useGameStore();
+
+  const SECRET_BOOK_TIERS = ['Initiate', 'Adept', 'Master', 'GrandMaster'];
 
   // Group modules by tier
   const tierGroups = TIERS.map((tier) => ({
@@ -48,10 +50,28 @@ export function MissionMap({ onSelectModule }: MissionMapProps) {
 
   return (
     <div className="p-6 overflow-auto">
-      {tierGroups.map(({ tier, modules }) => {
+      {tierGroups.map(({ tier, modules }, groupIdx) => {
         if (modules.length === 0) return null;
+        const isSecretBookTier = SECRET_BOOK_TIERS.includes(tier.name);
+        if (isSecretBookTier && !secretBookUnlocked) return null;
+
+        // Show Secret Book divider before the first SB tier
+        const isFirstSBTier = isSecretBookTier && !tierGroups.slice(0, groupIdx).some(
+          g => SECRET_BOOK_TIERS.includes(g.tier.name) && g.modules.length > 0
+        );
+
         return (
-          <div key={tier.name} className="mb-6">
+          <div key={tier.name}>
+            {isFirstSBTier && (
+              <div className="my-8 flex items-center gap-3">
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
+                <span className="text-purple-400 text-xs font-bold tracking-widest uppercase whitespace-nowrap">
+                  The Secret Book of Knowledge
+                </span>
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
+              </div>
+            )}
+          <div className="mb-6">
             {/* Tier header */}
             <div className="flex items-center gap-2 mb-3">
               <span className="text-lg">{tier.icon}</span>
@@ -158,6 +178,7 @@ export function MissionMap({ onSelectModule }: MissionMapProps) {
                 );
               })}
             </div>
+          </div>
           </div>
         );
       })}

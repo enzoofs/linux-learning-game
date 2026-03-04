@@ -25,6 +25,7 @@ interface GameActions {
   unequipItem: (slot: string) => void;
   setTheme: (themeId: string | null) => void;
   usePowerUp: (powerUpId: string) => boolean;
+  unlockSecretBook: () => void;
   reset: () => void;
 }
 
@@ -54,6 +55,7 @@ const DEFAULT_STATE: GameState = {
   equippedItems: {},
   activeTheme: null,
   powerUps: {},
+  secretBookUnlocked: false,
 };
 
 export const useGameStore = create<GameState & GameActions>()((set, get) => ({
@@ -236,6 +238,8 @@ export const useGameStore = create<GameState & GameActions>()((set, get) => ({
     }));
     return true;
   },
+
+  unlockSecretBook: () => set({ secretBookUnlocked: true }),
 
   reset: () => {
     clearState();

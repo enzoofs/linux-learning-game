@@ -5,6 +5,10 @@ export const TIERS: Tier[] = [
   { name: 'Operator', displayName: 'Operador', color: '#60a5fa', icon: '⚡', minXP: 400 },
   { name: 'Specialist', displayName: 'Especialista', color: '#c084fc', icon: '🎯', minXP: 900 },
   { name: 'Commander', displayName: 'Comandante', color: '#f97316', icon: '🏆', minXP: 1600 },
+  { name: 'Initiate', displayName: 'Iniciado', color: '#a78bfa', icon: '📖', minXP: 2000 },
+  { name: 'Adept', displayName: 'Adepto', color: '#c084fc', icon: '🔮', minXP: 3500 },
+  { name: 'Master', displayName: 'Mestre', color: '#f59e0b', icon: '⚡', minXP: 6000 },
+  { name: 'GrandMaster', displayName: 'Grao-Mestre', color: '#ef4444', icon: '👁️', minXP: 12000 },
 ];
 
 export function getCurrentTier(xp: number): Tier {
