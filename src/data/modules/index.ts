@@ -5,6 +5,8 @@ import { filesNavigationModule } from './files-navigation';
 import { processMgmtModule } from './process-mgmt';
 import { textProcessingModule } from './text-processing';
 import { dataWranglingModule } from './data-wrangling';
+import { systemAdminModule } from './system-admin';
+import { oneLinerLegendModule } from './one-liner-legend';
 // Secret Book modules
 import { sbShellTricksModule } from './sb-shell-tricks';
 import { sbShellFunctionsModule } from './sb-shell-functions';
@@ -32,6 +34,8 @@ export const ALL_MODULES: Module[] = [
   processMgmtModule,
   textProcessingModule,
   dataWranglingModule,
+  systemAdminModule,
+  oneLinerLegendModule,
   // Secret Book modules
   sbShellTricksModule,
   sbShellFunctionsModule,

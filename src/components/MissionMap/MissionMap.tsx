@@ -31,11 +31,8 @@ function getModuleTier(moduleId: string): TierName {
   return 'Commander';
 }
 
-// Friendly names for unimplemented modules
-const PLACEHOLDER_NAMES: Record<string, string> = {
-  'system-admin': 'Admin do Sistema',
-  'one-liner-legend': 'Lenda do One-Liner',
-};
+// Friendly names for unimplemented modules (fallback)
+const PLACEHOLDER_NAMES: Record<string, string> = {};
 
 export function MissionMap({ onSelectModule }: MissionMapProps) {
   const { completedModules, isModuleUnlocked, secretBookUnlocked } = useGameStore();
