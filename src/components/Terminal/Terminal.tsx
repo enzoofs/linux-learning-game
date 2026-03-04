@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { TerminalLine, TerminalLineType } from '../../types';
+import { useGameStore } from '../../stores/gameStore';
+import { TERMINAL_THEMES } from '../../data/shopItems';
 
 interface TerminalProps {
   lines: TerminalLine[];
@@ -37,6 +39,11 @@ export function Terminal({
   placeholder = "digite um comando... (tente 'help')",
   disabled = false,
 }: TerminalProps) {
+  const activeTheme = useGameStore((s) => s.activeTheme);
+  const colors = activeTheme && TERMINAL_THEMES[activeTheme]
+    ? TERMINAL_THEMES[activeTheme]
+    : LINE_COLORS;
+
   const [shakeInput, setShakeInput] = useState(false);
   const [celebration, setCelebration] = useState(false);
 
@@ -83,7 +90,7 @@ export function Terminal({
         {lines.map((line, i) => (
           <div
             key={i}
-            style={{ color: LINE_COLORS[line.type] }}
+            style={{ color: colors[line.type] }}
             className={`whitespace-pre-wrap break-words ${
               line.type === 'system' || line.type === 'levelup' ? 'font-bold' : ''
             } ${line.type === 'levelup' ? 'text-[15px]' : 'text-[13px]'} ${
