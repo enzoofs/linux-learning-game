@@ -190,7 +190,7 @@ export interface GameState {
   secretBookUnlocked: boolean;
 }
 
-export type AppView = 'terminal' | 'map' | 'shop' | 'journal' | 'achievements' | 'stats';
+export type AppView = 'terminal' | 'map' | 'sandbox' | 'shop' | 'journal' | 'achievements' | 'stats';
 
 export type ShopItemCategory = 'skin' | 'cosmetic' | 'theme' | 'powerup';
 export type EquipmentSlot = 'helmet' | 'armor' | 'weapon' | 'accessory';

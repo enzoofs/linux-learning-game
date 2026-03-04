@@ -10,6 +10,25 @@ import { VirtualFS } from '../../utils/virtualFS';
 
 type GameMode = 'training' | 'challenge';
 
+// Bob Ross encouragement quotes — shown after repeated failures
+const BOB_ROSS_QUOTES = [
+  '"Não existem erros, apenas pequenos acidentes felizes." — Bob Ross',
+  '"Talento é um interesse cultivado. Qualquer coisa que você praticar, você consegue fazer." — Bob Ross',
+  '"O segredo de fazer qualquer coisa é acreditar que você consegue." — Bob Ross',
+  '"Acredite que você pode fazer isso, porque você pode." — Bob Ross',
+  '"É o contraste entre luz e sombra que dá significado a cada um." — Bob Ross',
+  '"Qualquer coisa que não gostarmos, transformamos numa arvorezinha feliz." — Bob Ross',
+  '"São as imperfeições que tornam algo bonito." — Bob Ross',
+  '"Basta uma pequena mudança de perspectiva e você começa a ver um mundo totalmente novo." — Bob Ross',
+  '"Colocamos um pouco de escuridão, só para a nossa luz aparecer." — Bob Ross',
+  '"Não há nada no mundo que gere mais sucesso do que o próprio sucesso." — Bob Ross',
+  '"Cada um vê o mundo do seu jeito. É isso que o torna tão especial." — Bob Ross',
+  '"Na vida você precisa de cores." — Bob Ross',
+  '"Já cometeu erros na vida? Vamos transformá-los em pássaros. É, agora são pássaros." — Bob Ross',
+  '"Vamos ficar um pouco loucos aqui." — Bob Ross',
+  '"Você tem poder ilimitado nesta tela — pode literalmente mover montanhas." — Bob Ross',
+];
+
 const DIFFICULTY_LABELS: Record<string, string> = {
   easy: 'FÁCIL',
   medium: 'MÉDIO',
@@ -46,11 +65,16 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
   });
   const [drillStartTime, setDrillStartTime] = useState(0);
   const [drillAttempts, setDrillAttempts] = useState(0);
+  const [bossAttempts, setBossAttempts] = useState(0);
   const [usedHint, setUsedHint] = useState(false);
   const [xpBoostActive, setXpBoostActive] = useState(false);
 
   // Hint Extra: track whether the offer has been shown so next 'hint' consumes the power-up
   const hintExtraOfferedRef = useRef(false);
+
+  // Guard against duplicate Secret Book reveal & cleanup timeouts on unmount
+  const secretBookRevealingRef = useRef(false);
+  const activeTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   // Game mode: training (can see brief) vs challenge (no brief, unlocks next module)
   const [gameMode, setGameMode] = useState<GameMode>('training');
@@ -65,6 +89,20 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
   const updateCwd = useCallback(() => {
     const cwd = vfsRef.current.pwd();
     setCwdDisplay(cwd.replace('/home/enzo', '~') || '~');
+  }, []);
+
+  // Cleanup all tracked timeouts on unmount
+  useEffect(() => {
+    return () => {
+      activeTimeoutsRef.current.forEach(clearTimeout);
+      activeTimeoutsRef.current = [];
+    };
+  }, []);
+
+  const scheduleTimeout = useCallback((fn: () => void, delay: number) => {
+    const id = setTimeout(fn, delay);
+    activeTimeoutsRef.current.push(id);
+    return id;
   }, []);
 
   // Sync session state to store on every phase/drill/boss change
@@ -112,6 +150,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       }
       terminal.resetWithLines(lines);
     } else if (phase === 'boss') {
+      setBossAttempts(0);
       terminal.resetWithLines([
         { type: 'system', text: `═══ 🏆 DESAFIO BOSS: ${module.boss.title.toUpperCase()} ═══` },
         { type: 'brief', text: module.boss.scenario },
@@ -167,7 +206,6 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       terminal.setInputValue('');
       return;
     }
-
     // Check sandbox commands
     const baseCmd = cmd.split(/\s+/)[0];
 
@@ -277,7 +315,8 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       return;
     }
 
-    setDrillAttempts((a) => a + 1);
+    const attemptNum = drillAttempts + 1;
+    setDrillAttempts(attemptNum);
     const result = analyzeCommand(cmd, currentDrill.check, currentDrill.feedbackRules);
 
     if (result.type === 'success') {
@@ -309,7 +348,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       }
 
       // Move to next drill or boss
-      setTimeout(() => {
+      scheduleTimeout(() => {
         const next = currentDrillIndex + 1;
         if (next < module.drills.length) {
           setCurrentDrillIndex(next);
@@ -351,8 +390,15 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       }
     }
 
+    // Bob Ross encouragement after 3+ failed attempts (every 2 attempts)
+    if (result.type !== 'success' && attemptNum >= 3 && attemptNum % 2 === 1) {
+      const quote = BOB_ROSS_QUOTES[Math.floor(Math.random() * BOB_ROSS_QUOTES.length)];
+      terminal.addLine({ type: 'system', text: '' });
+      terminal.addLine({ type: 'hint', text: `🎨 ${quote}` });
+    }
+
     terminal.setInputValue('');
-  }, [terminal, currentDrill, currentDrillIndex, drillAttempts, drillStartTime, usedHint, module, addXP, completeDrill, updateCwd, handleBriefCommand, gameMode, xpBoostActive]);
+  }, [terminal, currentDrill, currentDrillIndex, drillAttempts, drillStartTime, usedHint, module, addXP, completeDrill, updateCwd, handleBriefCommand, gameMode, xpBoostActive, scheduleTimeout]);
 
   const handleBossSubmit = useCallback(() => {
     const cmd = terminal.inputValue.trim();
@@ -372,6 +418,8 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       return;
     }
 
+    const bossAttemptNum = bossAttempts + 1;
+    setBossAttempts(bossAttemptNum);
     const result = analyzeCommand(cmd, currentBoss.check, currentBoss.feedbackRules);
 
     if (result.type === 'success') {
@@ -413,35 +461,35 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
 
         // Check if all base modules are now complete — trigger Secret Book reveal
         const BASE_MODULE_IDS = ['cli-basics', 'pipes-streams', 'files-nav', 'process-mgmt', 'text-processing', 'data-wrangling'];
-        const updatedCompleted = [...completedModules, module.id];
-        const allBaseComplete = BASE_MODULE_IDS.every(id => updatedCompleted.includes(id));
         const storeState = useGameStore.getState();
+        const updatedCompleted = [...storeState.completedModules, module.id];
+        const allBaseComplete = BASE_MODULE_IDS.every(id => updatedCompleted.includes(id));
 
-        if (allBaseComplete && !storeState.secretBookUnlocked) {
-          setTimeout(() => {
+        if (allBaseComplete && !storeState.secretBookUnlocked && !secretBookRevealingRef.current) {
+          secretBookRevealingRef.current = true;
+          scheduleTimeout(() => {
             terminal.addLine({ type: 'system', text: '' });
             terminal.addLine({ type: 'system', text: '> Todos os modulos completados...' });
-            setTimeout(() => {
-              terminal.addLine({ type: 'system', text: '> Desbloqueando conhecimento oculto...' });
-              setTimeout(() => {
-                terminal.addLine({ type: 'system', text: '> ################## 100%' });
-                setTimeout(() => {
-                  terminal.addLine({ type: 'levelup', text: 'THE SECRET BOOK OF KNOWLEDGE foi revelado!' });
-                  terminal.addLine({ type: 'learned', text: '"Ha mais no CLI do que voce imagina, jovem aprendiz..."' });
-                  terminal.addLine({ type: 'system', text: '' });
-                  terminal.addLine({ type: 'success', text: '18 novos modulos foram adicionados ao Mapa de Missoes!' });
-                  storeState.unlockSecretBook();
-                }, 800);
-              }, 600);
-            }, 600);
           }, 4000);
-
-          setTimeout(() => {
+          scheduleTimeout(() => {
+            terminal.addLine({ type: 'system', text: '> Desbloqueando conhecimento oculto...' });
+          }, 4600);
+          scheduleTimeout(() => {
+            terminal.addLine({ type: 'system', text: '> ################## 100%' });
+          }, 5200);
+          scheduleTimeout(() => {
+            terminal.addLine({ type: 'levelup', text: 'THE SECRET BOOK OF KNOWLEDGE foi revelado!' });
+            terminal.addLine({ type: 'learned', text: '"Ha mais no CLI do que voce imagina, jovem aprendiz..."' });
+            terminal.addLine({ type: 'system', text: '' });
+            terminal.addLine({ type: 'success', text: '18 novos modulos foram adicionados ao Mapa de Missoes!' });
+            useGameStore.getState().unlockSecretBook();
+          }, 6000);
+          scheduleTimeout(() => {
             setPhase('completed');
             onModuleComplete();
           }, 8000);
         } else {
-          setTimeout(() => {
+          scheduleTimeout(() => {
             setPhase('completed');
             onModuleComplete();
           }, 3000);
@@ -479,8 +527,15 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       }
     }
 
+    // Bob Ross encouragement after 3+ failed attempts on boss (every 2 attempts)
+    if (result.type !== 'success' && bossAttemptNum >= 3 && bossAttemptNum % 2 === 1) {
+      const quote = BOB_ROSS_QUOTES[Math.floor(Math.random() * BOB_ROSS_QUOTES.length)];
+      terminal.addLine({ type: 'system', text: '' });
+      terminal.addLine({ type: 'hint', text: `🎨 ${quote}` });
+    }
+
     terminal.setInputValue('');
-  }, [terminal, currentBoss, currentBossStep, module, addXP, completeBoss, completeModule, addFreezeToken, clearSession, onModuleComplete, updateCwd, handleBriefCommand, gameMode, isAlreadyCompleted, xpBoostActive]);
+  }, [terminal, currentBoss, currentBossStep, module, addXP, completeBoss, completeModule, addFreezeToken, clearSession, onModuleComplete, updateCwd, handleBriefCommand, gameMode, isAlreadyCompleted, xpBoostActive, scheduleTimeout, completedModules, bossAttempts]);
 
   const handleSubmit = useCallback(() => {
     if (phase === 'sandbox') handleSandboxSubmit();
