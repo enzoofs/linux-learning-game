@@ -3,12 +3,19 @@ import type { Briefing as BriefingData } from '../../types';
 interface BriefingProps {
   title: string;
   briefing: BriefingData;
-  onContinue: () => void;
+  /** Standard mode: show mode selection buttons */
+  onStartTraining?: () => void;
+  onStartChallenge?: () => void;
+  /** Overlay mode: show a "back" button */
+  isOverlay?: boolean;
+  onClose?: () => void;
+  /** Legacy single-button mode (fallback) */
+  onContinue?: () => void;
 }
 
-export function Briefing({ title, briefing, onContinue }: BriefingProps) {
+export function Briefing({ title, briefing, onStartTraining, onStartChallenge, isOverlay, onClose, onContinue }: BriefingProps) {
   return (
-    <div className="p-6 max-h-[70vh] overflow-y-auto">
+    <div className={`p-6 ${isOverlay ? 'max-h-[60vh]' : 'max-h-[70vh]'} overflow-y-auto`}>
       <div className="text-lg font-bold text-cyan-400 mb-1 tracking-wide">
         📖 EXPLICAÇÃO: {title.toUpperCase()}
       </div>
@@ -48,12 +55,47 @@ export function Briefing({ title, briefing, onContinue }: BriefingProps) {
         </div>
       </div>
 
-      <button
-        onClick={onContinue}
-        className="w-full py-3 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg text-cyan-400 font-semibold text-sm transition-all cursor-pointer"
-      >
-        Entendi! Quero tentar →
-      </button>
+      {/* Overlay mode: back button */}
+      {isOverlay && onClose && (
+        <button
+          onClick={onClose}
+          className="w-full py-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-slate-300 font-semibold text-sm transition-all cursor-pointer"
+        >
+          Voltar ao exercício
+        </button>
+      )}
+
+      {/* Mode selection buttons */}
+      {!isOverlay && onStartTraining && onStartChallenge && (
+        <div className="space-y-3">
+          <button
+            onClick={onStartTraining}
+            className="w-full py-3 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg text-cyan-400 font-semibold text-sm transition-all cursor-pointer"
+          >
+            Modo Treino — com instruções disponíveis
+          </button>
+          <button
+            onClick={onStartChallenge}
+            className="w-full py-3 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-lg text-amber-400 font-semibold text-sm transition-all cursor-pointer"
+          >
+            Modo Desafio — sem instruções, libera próximo módulo
+          </button>
+          <p className="text-[11px] text-slate-500 text-center">
+            No Modo Treino você pode digitar 'brief' a qualquer momento para consultar as instruções.
+            No Modo Desafio, as instruções ficam bloqueadas mas completar desbloqueia o próximo módulo.
+          </p>
+        </div>
+      )}
+
+      {/* Legacy single button fallback */}
+      {!isOverlay && !onStartTraining && onContinue && (
+        <button
+          onClick={onContinue}
+          className="w-full py-3 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg text-cyan-400 font-semibold text-sm transition-all cursor-pointer"
+        >
+          Entendi! Quero tentar →
+        </button>
+      )}
     </div>
   );
 }
