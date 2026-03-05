@@ -22,6 +22,20 @@ export const sbAdvancedFindModule: Module = {
       'O `find` e como um rastreador profissional. Voce descreve as caracteristicas do alvo — nome, tipo, tamanho, idade — e ele vasculha cada canto do sistema ate encontrar. O `-exec` e como dar uma ordem: "quando encontrar, faca isso". E o `xargs` e o assistente que pega a lista de resultados e entrega para outro comando processar.',
     syntax:
       'find [caminho] [filtros] [acao]\nfind . -name "*.txt"              # busca por nome\nfind . -type f -size +10M         # arquivos maiores que 10MB\nfind . -mtime -7                  # modificados nos ultimos 7 dias\nfind . -name "*.tmp" -delete      # encontra e deleta\nfind . -name "*.sh" -exec chmod +x {} \\;  # executa comando\nfind . -name "*.log" | xargs wc -l        # conta linhas via xargs',
+    commandBreakdowns: [
+      {
+        title: 'find com múltiplos filtros + ação',
+        command: "find /var/log -name '*.log' -size +100M -mtime +30 -exec gzip {} \\;",
+        parts: [
+          { text: 'find /var/log', label: 'Busca recursiva a partir de /var/log' },
+          { text: "-name '*.log'", label: 'Filtro: nome termina em .log' },
+          { text: '-size +100M', label: 'Filtro: tamanho maior que 100 megabytes' },
+          { text: '-mtime +30', label: 'Filtro: modificado há mais de 30 dias' },
+          { text: '-exec gzip {}', label: 'Ação: comprime cada arquivo encontrado. {} = placeholder' },
+          { text: '\\;', label: 'Termina o -exec (precisa escapar o ; para o shell não interpretar)' },
+        ],
+      },
+    ],
     examples: [
       { command: 'find . -name "*.txt"', output: './notas.txt\n./docs/readme.txt\n./todo.txt', explanation: 'Busca recursivamente todos os arquivos .txt a partir do diretorio atual.' },
       { command: 'find /tmp -type d', output: '/tmp\n/tmp/cache\n/tmp/session', explanation: 'Lista apenas diretorios (-type d) dentro de /tmp.' },

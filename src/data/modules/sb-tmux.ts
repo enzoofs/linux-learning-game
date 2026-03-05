@@ -26,6 +26,29 @@ export const sbTmuxModule: Module = {
       'O tmux e como uma mesa de trabalho magica: voce pode dividir a mesa em areas (paineis), ter varias mesas empilhadas (janelas), e agrupar tudo em escritorios (sessoes). Mesmo se voce sair do escritorio, tudo continua exatamente onde estava.',
     syntax:
       'tmux new-session -s nome\ntmux split-window -h | -v\ntmux select-pane -U | -D | -L | -R\ntmux list-sessions\ntmux attach-session -t nome\ntmux detach (ou Ctrl+b d)\ntmux resize-pane -U|-D|-L|-R [n]',
+    commandBreakdowns: [
+      {
+        title: 'Anatomia do tmux new-session',
+        command: 'tmux new-session -d -s servidor -n logs',
+        parts: [
+          { label: 'tmux', text: 'Terminal multiplexer — gerencia múltiplas sessões/janelas/painéis' },
+          { label: 'new-session', text: 'Cria uma nova sessão' },
+          { label: '-d', text: 'Detached — cria sem entrar nela (roda em segundo plano)' },
+          { label: '-s servidor', text: 'Nome da sessão (para identificação ao reconectar)' },
+          { label: '-n logs', text: 'Nome da primeira janela (window) dentro da sessão' },
+        ],
+      },
+      {
+        title: 'Dividindo e navegando painéis',
+        command: 'tmux split-window -h -p 30',
+        parts: [
+          { label: 'tmux', text: 'Prefixo do comando tmux (ou use Ctrl+b dentro da sessão)' },
+          { label: 'split-window', text: 'Divide a janela atual em dois painéis' },
+          { label: '-h', text: 'Horizontal split — divide lado a lado (vertical: -v, divide em cima/baixo)' },
+          { label: '-p 30', text: 'Porcentagem — o novo painel ocupa 30% do espaço' },
+        ],
+      },
+    ],
     examples: [
       { command: 'tmux new-session -s dev', output: '(nova sessao "dev" criada)', explanation: 'Cria uma sessao chamada "dev". Nomear sessoes facilita a organizacao.' },
       { command: 'tmux split-window -h', output: '(painel dividido horizontalmente)', explanation: 'Divide o painel atual em dois, lado a lado.' },

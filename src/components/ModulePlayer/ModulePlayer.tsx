@@ -7,6 +7,7 @@ import { useGameStore } from '../../stores/gameStore';
 import { analyzeCommand } from '../../utils/commandParser';
 import { getLearnedCommands } from '../../data/modules';
 import { VirtualFS } from '../../utils/virtualFS';
+import { soundManager } from '../../utils/soundManager';
 
 type GameMode = 'training' | 'challenge';
 
@@ -271,6 +272,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     }
     if (cmd === 'hint') {
       setUsedHint(true);
+      soundManager.play('hint');
       if (drillAttempts < currentDrill.hints.length) {
         // Normal hints still available
         const hintIndex = Math.min(drillAttempts, currentDrill.hints.length - 1);
@@ -328,6 +330,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
         terminal.addLine({ type: 'output', text: currentDrill.expectedOutput });
       }
       const drillXpAmount = xpBoostActive ? currentDrill.xp * 2 : currentDrill.xp;
+      soundManager.play('success');
       terminal.addLine({ type: 'success', text: `CORRETO! +${drillXpAmount} XP${xpBoostActive ? ' (Boost x2!)' : ''}` });
 
       addXP(drillXpAmount);
@@ -343,6 +346,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
 
       if (!usedHint && drillAttempts === 0) {
         const bonusXp = xpBoostActive ? 50 : 25;
+        soundManager.play('xp');
         terminal.addLine({ type: 'levelup', text: `BÔNUS DE PRIMEIRA! +${bonusXp} XP${xpBoostActive ? ' (Boost x2!)' : ''}` });
         addXP(bonusXp);
       }
@@ -357,8 +361,10 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
         }
       }, 1500);
     } else if (result.type === 'feedback') {
+      soundManager.play('error');
       terminal.addLine({ type: 'feedback', text: result.message });
     } else if (result.type === 'typo') {
+      soundManager.play('error');
       terminal.addLine({ type: 'feedback', text: result.message });
     } else {
       // Try VFS first
@@ -385,6 +391,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
           }
         }
         if (!isLearned) {
+          soundManager.play('error');
           terminal.addLine({ type: 'error', text: result.message });
         }
       }
@@ -413,6 +420,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     }
     if (cmd === 'hint') {
       const hintIndex = 0;
+      soundManager.play('hint');
       terminal.addLine({ type: 'hint', text: `Hint: ${currentBoss.hints[hintIndex]}` });
       terminal.setInputValue('');
       return;
@@ -430,6 +438,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       if (currentBoss.expectedOutput) {
         terminal.addLine({ type: 'output', text: currentBoss.expectedOutput });
       }
+      soundManager.play('success');
       terminal.addLine({ type: 'success', text: 'Etapa concluída!' });
 
       const nextStep = currentBossStep + 1;
@@ -448,6 +457,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
 
         addFreezeToken();
         clearSession();
+        soundManager.play('bossDefeat');
         terminal.addLine({ type: 'system', text: '' });
         terminal.addLine({ type: 'levelup', text: `BOSS DERROTADO: ${module.boss.title}! +${bossXpAmount} XP${xpBoostActive ? ' (Boost x2!)' : ''}` });
         terminal.addLine({ type: 'success', text: 'Ganhou 1 Token de Proteção de Streak!' });
@@ -467,6 +477,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
 
         if (allBaseComplete && !storeState.secretBookUnlocked && !secretBookRevealingRef.current) {
           secretBookRevealingRef.current = true;
+          soundManager.play('secretReveal');
           scheduleTimeout(() => {
             terminal.addLine({ type: 'system', text: '' });
             terminal.addLine({ type: 'system', text: '> Todos os modulos completados...' });
@@ -496,6 +507,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
         }
       }
     } else if (result.type === 'feedback') {
+      soundManager.play('error');
       terminal.addLine({ type: 'feedback', text: result.message });
     } else {
       // Try VFS first
@@ -522,6 +534,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
           }
         }
         if (!isLearned) {
+          soundManager.play('error');
           terminal.addLine({ type: 'error', text: result.message });
         }
       }
@@ -561,12 +574,14 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
 
       {phase === 'briefing' && (
         <>
-          <Briefing
-            title={module.title}
-            briefing={module.briefing}
-            onStartTraining={() => handleStartMode('training')}
-            onStartChallenge={() => handleStartMode('challenge')}
-          />
+          <div className="max-h-[80vh] overflow-y-auto">
+            <Briefing
+              title={module.title}
+              briefing={module.briefing}
+              onStartTraining={() => handleStartMode('training')}
+              onStartChallenge={() => handleStartMode('challenge')}
+            />
+          </div>
           {/* XP Boost power-up activation */}
           {(() => {
             const boostCount = useGameStore.getState().powerUps['xp-boost'] ?? 0;
@@ -602,13 +617,15 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
         <>
           {/* Briefing overlay for training mode */}
           {showBriefingOverlay && (
-            <div className="absolute inset-0 z-40 bg-[#0a0f1e]/95 overflow-y-auto">
-              <Briefing
-                title={module.title}
-                briefing={module.briefing}
-                isOverlay
-                onClose={() => setShowBriefingOverlay(false)}
-              />
+            <div className="absolute inset-0 z-40 bg-[#0a0f1e]/95 flex items-start justify-center overflow-y-auto">
+              <div className="w-full max-w-2xl my-6 max-h-[85vh] overflow-y-auto rounded-xl bg-slate-800/90 border border-slate-700">
+                <Briefing
+                  title={module.title}
+                  briefing={module.briefing}
+                  isOverlay
+                  onClose={() => setShowBriefingOverlay(false)}
+                />
+              </div>
             </div>
           )}
 

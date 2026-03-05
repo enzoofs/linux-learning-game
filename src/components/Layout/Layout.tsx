@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 // import { PixelAvatar } from '../Avatar/PixelAvatar';  // TODO: reativar com a loja
 import type { AppView } from '../../types';
+import { soundManager } from '../../utils/soundManager';
 
 interface LayoutProps {
   currentView: AppView;
@@ -21,6 +23,7 @@ const NAV_TABS: { id: AppView; label: string }[] = [
 
 export function Layout({ currentView, onViewChange, children }: LayoutProps) {
   const { totalXP, lifetimeXP, getCurrentTier, getNextTier, currentStreak } = useGameStore();
+  const [soundMuted, setSoundMuted] = useState(false);
   const tier = getCurrentTier();
   const nextTier = getNextTier();
   const xp = lifetimeXP || totalXP;
@@ -49,6 +52,16 @@ export function Layout({ currentView, onViewChange, children }: LayoutProps) {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => {
+                soundManager.muted = !soundManager.muted;
+                setSoundMuted(soundManager.muted);
+              }}
+              className="text-slate-500 hover:text-slate-300 text-sm px-2 transition-colors"
+              title={soundMuted ? 'Ativar som' : 'Silenciar'}
+            >
+              {soundMuted ? '🔇' : '🔊'}
+            </button>
             {currentStreak > 0 && (
               <div className="text-sm text-orange-400 font-semibold">
                 🔥 {currentStreak}d seguidos

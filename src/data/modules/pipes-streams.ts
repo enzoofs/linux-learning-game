@@ -27,6 +27,29 @@ export const pipesStreamsModule: Module = {
       'Pipes são como canos de água — os dados fluem de um comando para o próximo. Cada comando é um filtro ou transformador ao longo do pipeline. Redirects (\`>\` e \`>>\`) são como torneiras que enviam o fluxo para um arquivo em vez da tela. \`>\` troca a água do balde, enquanto \`>>\` despeja mais água no mesmo balde.',
     syntax:
       'command1 | command2        # pipe output of command1 into command2\ncommand > file             # write output to file (overwrite)\ncommand >> file            # append output to file\necho "text"                # print text to stdout\ncat file                   # read file to stdout\nwc [-l|-w|-c] [file]       # count lines/words/chars\ngrep "pattern" [file]      # filter lines matching pattern\nhead -N file               # show first N lines\ntail -N file               # show last N lines',
+    commandBreakdowns: [
+      {
+        title: 'Pipeline de filtragem',
+        command: "cat access.log | grep 'ERROR' | cut -d' ' -f1,4 | sort | uniq -c",
+        parts: [
+          { text: 'cat access.log', label: 'Lê o conteúdo do arquivo e envia para stdout' },
+          { text: '|', label: 'Pipe — conecta a saída de um comando à entrada do próximo' },
+          { text: "grep 'ERROR'", label: 'Filtra apenas as linhas que contêm "ERROR"' },
+          { text: "cut -d' ' -f1,4", label: 'Recorta campos: -d\' \' (delimitador = espaço), -f1,4 (campos 1 e 4)' },
+          { text: 'sort', label: 'Ordena as linhas (necessário para uniq funcionar)' },
+          { text: 'uniq -c', label: 'Remove duplicatas e conta ocorrências de cada linha' },
+        ],
+      },
+      {
+        title: 'Redirecionamento de saída e erro',
+        command: "find / -name '*.conf' > resultados.txt 2> erros.txt",
+        parts: [
+          { text: "find / -name '*.conf'", label: 'Busca todos os arquivos .conf a partir da raiz' },
+          { text: '> resultados.txt', label: 'Redireciona stdout (saída padrão) para o arquivo — sobrescreve' },
+          { text: '2> erros.txt', label: 'Redireciona stderr (fd 2 = erros) para outro arquivo' },
+        ],
+      },
+    ],
     examples: [
       { command: 'echo "Hello Linux"', output: 'Hello Linux', explanation: 'Imprime o texto no terminal. A forma mais simples de produzir saída.' },
       { command: 'echo "Hello Linux" > hello.txt', output: '', explanation: 'Escreve "Hello Linux" no hello.txt. Se o arquivo existir, ele é sobrescrito.' },

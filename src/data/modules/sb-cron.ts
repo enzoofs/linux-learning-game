@@ -22,6 +22,22 @@ export const sbCronModule: Module = {
       'Pense no cron como um despertador inteligente. Voce programa os horarios e ele executa as tarefas automaticamente — sem voce precisar estar presente. O crontab e a lista de alarmes configurados.',
     syntax:
       'crontab -l                    # Lista tarefas agendadas\ncrontab -e                    # Edita o crontab\ncrontab -r                    # Remove o crontab\n* * * * * comando             # min hora dia mes dia_semana\n@daily /path/to/script.sh     # Atalho: executa todo dia a meia-noite\n@reboot /path/to/script.sh    # Executa ao iniciar o sistema',
+    commandBreakdowns: [
+      {
+        title: 'Anatomia da expressão cron',
+        command: '30 2 * * 1 /scripts/backup.sh >> /var/log/backup.log 2>&1',
+        parts: [
+          { text: '30', label: 'Minuto (0-59): executa no minuto 30' },
+          { text: '2', label: 'Hora (0-23): às 2h da manhã' },
+          { text: '*', label: 'Dia do mês (1-31): qualquer dia' },
+          { text: '*', label: 'Mês (1-12): qualquer mês' },
+          { text: '1', label: 'Dia da semana (0-7): segunda-feira (0 e 7 = domingo)' },
+          { text: '/scripts/backup.sh', label: 'O comando/script a executar' },
+          { text: '>> /var/log/backup.log', label: 'Redireciona saída (append) para arquivo de log' },
+          { text: '2>&1', label: 'Redireciona stderr para o mesmo destino que stdout' },
+        ],
+      },
+    ],
     examples: [
       { command: 'crontab -l', output: '0 2 * * * /usr/local/bin/backup.sh\n30 8 * * 1 /home/enzo/relatorio.sh', explanation: 'Lista todas as tarefas agendadas no crontab do usuario atual.' },
       { command: 'crontab -e', output: '# Abre o editor para modificar o crontab', explanation: 'Abre o crontab no editor padrao para adicionar ou editar tarefas.' },

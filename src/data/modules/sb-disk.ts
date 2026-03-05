@@ -22,6 +22,21 @@ export const sbDiskModule: Module = {
       'Pense no disco como um armário. `df` mostra quantas prateleiras estão cheias. `du` mostra quanto espaço cada caixa ocupa. `ln -s` cria etiquetas que apontam para caixas em outros armários. `tar` empacota várias caixas em uma só para transporte.',
     syntax:
       'df -h\ndu -sh diretorio\ndu --max-depth=1 -h /caminho\nlsblk\nln -s alvo nome_do_link\ntar czf arquivo.tar.gz diretorio/\ntar xzf arquivo.tar.gz',
+    commandBreakdowns: [
+      {
+        title: 'Criando e extraindo arquivos tar',
+        command: 'tar czf backup.tar.gz -C /home/user docs/ fotos/',
+        parts: [
+          { text: 'tar', label: 'Tape Archive — empacota múltiplos arquivos em um só' },
+          { text: 'c', label: 'Create — cria um novo arquivo (x = extrair, t = listar)' },
+          { text: 'z', label: 'Comprime com gzip (j = bzip2, J = xz)' },
+          { text: 'f', label: 'File — o próximo argumento é o nome do arquivo' },
+          { text: 'backup.tar.gz', label: 'Nome do arquivo de saída' },
+          { text: '-C /home/user', label: 'Muda para este diretório antes de empacotar' },
+          { text: 'docs/ fotos/', label: 'Os diretórios a incluir no arquivo' },
+        ],
+      },
+    ],
     examples: [
       { command: 'df -h', output: 'Filesystem      Size  Used Avail Use% Mounted on\n/dev/sda1        50G   32G   16G  67% /\n/dev/sdb1       500G  200G  280G  42% /data', explanation: 'Mostra espaço em disco de todas as partições em formato legível (-h = human).' },
       { command: 'du -sh /var/log', output: '2.3G\t/var/log', explanation: 'Mostra o tamanho total de /var/log. `-s` resume, `-h` formata.' },

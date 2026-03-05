@@ -29,6 +29,29 @@ export const sbVimModule: Module = {
       'O Vim e como um instrumento musical: no inicio parece impossivel, mas cada tecla e uma nota. O modo Normal e quando voce posiciona os dedos. O modo Insert e quando voce toca. Com pratica, voce compoe sinfonias de texto sem tirar as maos do teclado.',
     syntax:
       'vim arquivo\ni (insert) | Esc (normal) | v (visual)\n:w (salvar) | :q (sair) | :wq (salvar e sair) | :q! (sair sem salvar)\ndd (deletar linha) | yy (copiar) | p (colar) | u (desfazer)\n/padrao (buscar) | :%s/old/new/g (substituir tudo)',
+    commandBreakdowns: [
+      {
+        title: 'Busca e substituição no Vim',
+        command: ':%s/http/https/g',
+        parts: [
+          { text: ':', label: 'Entra no modo Comando (executa comandos ex)' },
+          { text: '%', label: 'Escopo: todas as linhas do arquivo (sem %, só a linha atual)' },
+          { text: 's', label: 'Comando de substituição (substitute)' },
+          { text: '/http/', label: 'O padrão a buscar' },
+          { text: '/https/', label: 'O texto de substituição' },
+          { text: 'g', label: 'Flag global — substitui todas as ocorrências na linha (sem g, só a primeira)' },
+        ],
+      },
+      {
+        title: 'Combinando movimentos no Vim',
+        command: 'd3w',
+        parts: [
+          { text: 'd', label: 'Operador: delete (deletar). Outros: y (copiar), c (mudar)' },
+          { text: '3', label: 'Multiplicador: repete o movimento 3 vezes' },
+          { text: 'w', label: 'Movimento: word (próxima palavra). Resultado: deleta as 3 próximas palavras' },
+        ],
+      },
+    ],
     examples: [
       { command: 'vim config.yml', output: '(abre o arquivo no Vim)', explanation: 'Abre o arquivo config.yml no editor Vim.' },
       { command: 'i', output: '-- INSERT --', explanation: 'Entra no modo de insercao. Agora voce pode digitar texto normalmente.' },

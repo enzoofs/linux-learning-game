@@ -28,6 +28,32 @@ export const dataWranglingModule: Module = {
       'Pense nos seus dados como uma planilha. `cut` seleciona colunas, `sort` ordena linhas, `uniq` remove duplicatas, e `awk` é o motor de fórmulas que pode fazer qualquer coisa. `tr` é como buscar-e-substituir para caracteres individuais — trocando cada vírgula por tab, ou cada letra minúscula por maiúscula.',
     syntax:
       'sort [options] file          # sort lines\n  -n                          # numeric sort (10 after 9, not after 1)\n  -r                          # reverse order\n  -k N                        # sort by column N\nuniq [options]                # remove adjacent duplicates\n  -c                          # prefix lines with occurrence count\ncut -d DELIM -f FIELDS file   # extract columns\n  -d\',\'                       # use comma as delimiter\n  -f3                         # extract field 3\n  -f1,3                       # extract fields 1 and 3\nawk \'pattern {action}\' file   # pattern scanning and processing\n  -F\',\'                       # set field separator to comma\n  {print $2}                  # print 2nd column\n  {sum += $3} END {print sum} # sum a column\ntr SET1 SET2                  # translate characters\n  tr \',\' \'\\t\'                 # commas to tabs\n  tr \'[:lower:]\' \'[:upper:]\'  # lowercase to uppercase',
+    commandBreakdowns: [
+      {
+        title: 'Anatomia do awk',
+        command: "awk -F',' '{ sum += $3 } END { print sum }' data.csv",
+        parts: [
+          { text: 'awk', label: 'O comando — linguagem de processamento de texto linha por linha' },
+          { text: "-F','", label: 'Define o separador de campos (aqui: vírgula). Sem isso, usa espaço/tab' },
+          { text: "'...'", label: 'O programa awk entre aspas simples (protege do shell)' },
+          { text: '{ sum += $3 }', label: 'Bloco de ação — executa para CADA linha. $3 = terceiro campo' },
+          { text: '$3', label: 'Referência ao 3o campo/coluna. $1 = primeiro, $2 = segundo, $0 = linha inteira' },
+          { text: 'sum += $3', label: 'Acumula o valor do campo 3 na variável sum (começa em 0)' },
+          { text: 'END { print sum }', label: 'Bloco END — executa UMA vez, depois de processar todas as linhas' },
+          { text: 'data.csv', label: 'O arquivo de entrada' },
+        ],
+      },
+      {
+        title: 'Pipeline de contagem de frequência',
+        command: 'sort names.txt | uniq -c | sort -rn',
+        parts: [
+          { text: 'sort names.txt', label: 'Ordena as linhas — necessário porque uniq só detecta duplicatas adjacentes' },
+          { text: '|', label: 'Pipe — envia a saída do comando anterior para a entrada do próximo' },
+          { text: 'uniq -c', label: 'Remove duplicatas adjacentes E prefixar cada linha com a contagem de ocorrências' },
+          { text: 'sort -rn', label: '-r = reverso (maior primeiro), -n = numérico (10 > 9, não "10" < "9")' },
+        ],
+      },
+    ],
     examples: [
       { command: 'sort names.txt', output: 'Alice\nBob\nCharlie\nDiana\nEve', explanation: 'Ordena linhas alfabeticamente (A-Z). Esse é o comportamento padrão.' },
       { command: 'sort names.txt | uniq', output: 'Alice\nBob\nCharlie\nDiana\nEve', explanation: 'Ordena e depois remove linhas duplicadas. `uniq` só remove duplicatas *adjacentes*, então sempre ordene antes.' },
