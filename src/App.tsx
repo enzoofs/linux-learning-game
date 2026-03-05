@@ -1,13 +1,14 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense, lazy } from 'react';
 import { Layout } from './components/Layout/Layout';
 import { ModulePlayer } from './components/ModulePlayer/ModulePlayer';
-import { MissionMap } from './components/MissionMap/MissionMap';
-import { Achievements } from './components/Achievements/Achievements';
-import { Stats } from './components/Stats/Stats';
-import { Journal } from './components/Journal/Journal';
-import { Chat } from './components/Chat/Chat';
-import { Shop } from './components/Shop/Shop';
-import { Sandbox } from './components/Sandbox/Sandbox';
+
+const MissionMap = lazy(() => import('./components/MissionMap/MissionMap').then(m => ({ default: m.MissionMap })));
+const Achievements = lazy(() => import('./components/Achievements/Achievements').then(m => ({ default: m.Achievements })));
+const Stats = lazy(() => import('./components/Stats/Stats').then(m => ({ default: m.Stats })));
+const Journal = lazy(() => import('./components/Journal/Journal').then(m => ({ default: m.Journal })));
+const Shop = lazy(() => import('./components/Shop/Shop').then(m => ({ default: m.Shop })));
+const Sandbox = lazy(() => import('./components/Sandbox/Sandbox').then(m => ({ default: m.Sandbox })));
+const Chat = lazy(() => import('./components/Chat/Chat').then(m => ({ default: m.Chat })));
 import { useAchievementDetection } from './hooks/useAchievements';
 import { useGameStore } from './stores/gameStore';
 import { cliBasicsModule } from './data/modules/cli-basics';
@@ -98,24 +99,48 @@ function App() {
           />
         )}
         {view === 'map' && (
-          <MissionMap onSelectModule={(id) => {
-            const mod = getModuleById(id);
-            if (mod) {
-              setActiveModule(mod);
-              handleSetView('terminal');
-            }
-          }} />
+          <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-500">Carregando...</div>}>
+            <MissionMap onSelectModule={(id) => {
+              const mod = getModuleById(id);
+              if (mod) {
+                setActiveModule(mod);
+                handleSetView('terminal');
+              }
+            }} />
+          </Suspense>
         )}
-        {view === 'sandbox' && <Sandbox />}
-        {view === 'shop' && <Shop />}
-        {view === 'journal' && <Journal />}
-        {view === 'achievements' && <Achievements />}
-        {view === 'stats' && <Stats />}
+        {view === 'sandbox' && (
+          <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-500">Carregando...</div>}>
+            <Sandbox />
+          </Suspense>
+        )}
+        {view === 'shop' && (
+          <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-500">Carregando...</div>}>
+            <Shop />
+          </Suspense>
+        )}
+        {view === 'journal' && (
+          <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-500">Carregando...</div>}>
+            <Journal />
+          </Suspense>
+        )}
+        {view === 'achievements' && (
+          <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-500">Carregando...</div>}>
+            <Achievements />
+          </Suspense>
+        )}
+        {view === 'stats' && (
+          <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-500">Carregando...</div>}>
+            <Stats />
+          </Suspense>
+        )}
       </Layout>
-      <Chat moduleContext={activeModule ? {
-        title: activeModule.title,
-        phase: useGameStore.getState().currentPhase || 'menu',
-      } : undefined} />
+      <Suspense fallback={null}>
+        <Chat moduleContext={activeModule ? {
+          title: activeModule.title,
+          phase: useGameStore.getState().currentPhase || 'menu',
+        } : undefined} />
+      </Suspense>
     </>
   );
 }

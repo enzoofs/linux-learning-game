@@ -22,6 +22,27 @@ export const sbGitModule: Module = {
       'Pense no histórico do Git como uma linha do tempo. `rebase -i` permite viajar no tempo e reorganizar eventos. `cherry-pick` é copiar um evento específico de uma timeline alternativa. `bisect` é um detetive que usa eliminação para encontrar onde algo deu errado. `stash` é uma gaveta onde você guarda trabalho inacabado. `reflog` é a caixa-preta que registra tudo — mesmo o que você tentou apagar.',
     syntax:
       'git stash [push -m "msg" | pop | list]\ngit rebase -i HEAD~N\ngit cherry-pick <commit-hash>\ngit bisect start / good / bad\ngit reflog\ngit blame <file>\ngit log --graph --oneline --all',
+    commandBreakdowns: [
+      {
+        title: 'Rebase interativo',
+        command: 'git rebase -i HEAD~3',
+        parts: [
+          { label: 'git rebase', text: 'Reaplica commits sobre uma nova base (reescreve histórico)' },
+          { label: '-i', text: 'Interativo — abre editor para escolher o que fazer com cada commit' },
+          { label: 'HEAD~3', text: 'Os últimos 3 commits. HEAD = commit atual, ~3 = 3 commits atrás' },
+        ],
+      },
+      {
+        title: 'Caça ao bug com bisect',
+        command: 'git bisect start HEAD v1.0',
+        parts: [
+          { label: 'git bisect', text: 'Busca binária no histórico de commits para encontrar onde um bug surgiu' },
+          { label: 'start', text: 'Inicia a sessão de bisect' },
+          { label: 'HEAD', text: 'O commit "ruim" (onde o bug existe) — normalmente o estado atual' },
+          { label: 'v1.0', text: 'O commit "bom" (onde o bug não existia) — pode ser tag, hash ou branch' },
+        ],
+      },
+    ],
     examples: [
       { command: 'git stash push -m "wip: feature login"', output: 'Saved working directory and index state On main: wip: feature login', explanation: 'Salva as alterações atuais no stash com uma mensagem descritiva.' },
       { command: 'git stash list', output: 'stash@{0}: On main: wip: feature login\nstash@{1}: On main: debug temp', explanation: 'Lista todos os stashes salvos, do mais recente ao mais antigo.' },

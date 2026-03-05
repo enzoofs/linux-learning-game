@@ -23,6 +23,28 @@ export const sbSshModule: Module = {
       'Pense no SSH como um túnel blindado entre seu computador e o servidor. O `ssh-keygen` cria uma fechadura especial (chave pública no servidor) e uma chave única (chave privada no seu PC). Só quem tem a chave certa consegue entrar pelo túnel.',
     syntax:
       'ssh [user@]hostname\nssh-keygen -t ed25519 -C "email"\nssh-copy-id user@host\nscp origem user@host:destino\nssh -L porta_local:host:porta_remota user@host',
+    commandBreakdowns: [
+      {
+        title: 'Gerando chaves SSH',
+        command: "ssh-keygen -t ed25519 -C 'enzo@email.com'",
+        parts: [
+          { text: 'ssh-keygen', label: 'Gera par de chaves (pública + privada) para autenticação' },
+          { text: '-t ed25519', label: 'Tipo do algoritmo: Ed25519 (moderno, seguro e rápido; alternativa: rsa)' },
+          { text: "-C 'enzo@email.com'", label: 'Comentário anexado à chave (para identificação, não afeta segurança)' },
+        ],
+      },
+      {
+        title: 'SSH Port Forwarding (túnel)',
+        command: 'ssh -L 8080:localhost:3000 enzo@servidor.com',
+        parts: [
+          { text: 'ssh', label: 'Cliente SSH — inicia conexão segura' },
+          { text: '-L', label: 'Local port forwarding — cria um túnel da máquina local para a remota' },
+          { text: '8080', label: 'Porta local que será aberta na sua máquina' },
+          { text: 'localhost:3000', label: 'Host:porta no lado remoto (localhost = o próprio servidor)' },
+          { text: 'enzo@servidor.com', label: 'Usuário e endereço do servidor remoto' },
+        ],
+      },
+    ],
     examples: [
       { command: 'ssh enzo@servidor.com', output: 'Welcome to Ubuntu 22.04\nenzo@servidor:~$', explanation: 'Conecta ao servidor como o usuário "enzo".' },
       { command: 'ssh-keygen -t ed25519 -C "enzo@email.com"', output: 'Generating public/private ed25519 key pair.\nYour identification has been saved in /home/enzo/.ssh/id_ed25519', explanation: 'Gera um par de chaves Ed25519 — o algoritmo mais moderno e seguro.' },

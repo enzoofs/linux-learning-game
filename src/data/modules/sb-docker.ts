@@ -21,6 +21,31 @@ export const sbDockerModule: Module = {
       'Pense em imagens Docker como receitas de bolo e containers como os bolos prontos. A receita (imagem) pode gerar quantos bolos (containers) voce quiser, todos identicos. O Dockerfile e o caderno de receitas, e o docker-compose e o planejamento de um banquete com varios pratos.',
     syntax:
       'docker run [opcoes] imagem [comando]    # Cria e inicia um container\ndocker ps                                # Lista containers em execucao\ndocker images                            # Lista imagens locais\ndocker exec -it container comando        # Executa comando em container ativo\ndocker logs container                    # Ve logs de um container\ndocker stop container                    # Para um container\ndocker rm container                      # Remove um container\ndocker build -t nome .                   # Constroi imagem a partir do Dockerfile\ndocker-compose up -d                     # Sobe servicos definidos no compose',
+    commandBreakdowns: [
+      {
+        title: 'Anatomia do docker run',
+        command: 'docker run -d --name web -p 8080:80 -v ./html:/usr/share/nginx/html nginx:latest',
+        parts: [
+          { text: 'docker run', label: 'Cria e inicia um novo container' },
+          { text: '-d', label: 'Detached mode — roda em segundo plano (sem travar o terminal)' },
+          { text: '--name web', label: 'Nomeia o container como "web" (sem isso, recebe nome aleatório)' },
+          { text: '-p 8080:80', label: 'Mapeia porta: host:container (acesso via localhost:8080 → porta 80 dentro do container)' },
+          { text: '-v ./html:/usr/share/nginx/html', label: 'Volume/bind mount: monta diretório local dentro do container' },
+          { text: 'nginx:latest', label: 'A imagem a usar (nome:tag). "latest" é a tag padrão' },
+        ],
+      },
+      {
+        title: 'Acessando um container em execução',
+        command: 'docker exec -it web bash',
+        parts: [
+          { text: 'docker exec', label: 'Executa um comando dentro de um container já rodando' },
+          { text: '-i', label: 'Interactive — mantém stdin aberto (permite digitar)' },
+          { text: '-t', label: 'TTY — aloca um pseudo-terminal (formata a saída corretamente)' },
+          { text: 'web', label: 'Nome ou ID do container alvo' },
+          { text: 'bash', label: 'O comando a executar (abre um shell interativo dentro do container)' },
+        ],
+      },
+    ],
     examples: [
       { command: 'docker run -d --name web -p 8080:80 nginx', output: 'a1b2c3d4e5f6...', explanation: 'Inicia um container nginx em background (-d), com nome "web", mapeando a porta 8080 do host para a 80 do container.' },
       { command: 'docker ps', output: 'CONTAINER ID  IMAGE  COMMAND                 STATUS       PORTS                  NAMES\na1b2c3d4e5f6  nginx  "/docker-entrypoint..."  Up 2 min     0.0.0.0:8080->80/tcp   web', explanation: 'Lista todos os containers em execucao com seus detalhes.' },

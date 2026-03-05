@@ -22,6 +22,19 @@ export const sbLogsModule: Module = {
       'Pense nos logs como cameras de seguranca do sistema. O `journalctl` e a sala de monitoramento onde voce pode assistir as gravacoes, filtrar por camera (servico), voltar no tempo e ver ao vivo. O `dmesg` e a camera especial do kernel.',
     syntax:
       'journalctl                         # Todos os logs\njournalctl -u servico               # Logs de um servico\njournalctl -f                        # Acompanhar em tempo real\njournalctl --since "2024-03-01"      # Desde uma data\njournalctl -p err                    # Apenas erros\ndmesg                                # Mensagens do kernel\nlast                                 # Historico de logins\nlogger "mensagem"                    # Escreve no log',
+    commandBreakdowns: [
+      {
+        title: 'Filtrando logs com journalctl',
+        command: "journalctl -u nginx --since '1 hour ago' -p err -f",
+        parts: [
+          { text: 'journalctl', label: 'Consulta logs do systemd journal' },
+          { text: '-u nginx', label: 'Filtra por unidade/serviço (apenas logs do nginx)' },
+          { text: "--since '1 hour ago'", label: 'Apenas logs da última hora (aceita datas absolutas também)' },
+          { text: '-p err', label: 'Prioridade mínima: error (outras: debug, info, warning, crit, alert, emerg)' },
+          { text: '-f', label: 'Follow — acompanha novos logs em tempo real (como tail -f)' },
+        ],
+      },
+    ],
     examples: [
       { command: 'journalctl -u ssh', output: 'Mar 04 10:00:01 server sshd[1234]: Accepted publickey for enzo\nMar 04 10:00:01 server sshd[1234]: pam_unix(sshd:session): session opened', explanation: 'Mostra apenas os logs do servico SSH.' },
       { command: 'journalctl -f', output: '(acompanha novos logs em tempo real — Ctrl+C para sair)', explanation: 'Segue os logs ao vivo, util para monitorar eventos enquanto acontecem.' },

@@ -28,6 +28,31 @@ export const sbCurlModule: Module = {
       'Pense no `curl` como um carteiro digital. Você escreve uma carta (requisição), coloca o endereço (URL), pode adicionar instruções especiais no envelope (headers), e o carteiro entrega e traz a resposta de volta para o seu terminal.',
     syntax:
       'curl [options] URL\ncurl -X POST -d \'data\' URL\ncurl -H \'Header: value\' URL\ncurl -o arquivo URL\ncurl -sL URL | jq .',
+    commandBreakdowns: [
+      {
+        title: 'curl POST com JSON',
+        command: "curl -X POST -d '{\"name\":\"enzo\"}' -H 'Content-Type: application/json' https://api.exemplo.com/users",
+        parts: [
+          { text: 'curl', label: 'Ferramenta de transferência de dados via URL' },
+          { text: '-X POST', label: 'Define o método HTTP (GET é o padrão, aqui forçamos POST)' },
+          { text: '-d \'{"name":"enzo"}\'', label: 'Data/body da requisição — o conteúdo enviado ao servidor' },
+          { text: '-H \'Content-Type: application/json\'', label: 'Header HTTP — informa que o body está em JSON' },
+          { text: 'https://api.exemplo.com/users', label: 'A URL de destino (endpoint da API)' },
+        ],
+      },
+      {
+        title: 'Pipeline curl + jq',
+        command: "curl -s https://api.github.com/users/torvalds | jq '.name, .bio'",
+        parts: [
+          { text: 'curl', label: 'Faz a requisição HTTP' },
+          { text: '-s', label: 'Silent mode — suprime barra de progresso e mensagens de status' },
+          { text: 'https://api.github.com/users/torvalds', label: 'URL da API do GitHub' },
+          { text: '|', label: 'Pipe — envia a resposta JSON para o próximo comando' },
+          { text: 'jq', label: 'Processador de JSON na linha de comando' },
+          { text: "'.name, .bio'", label: 'Filtro jq — extrai os campos "name" e "bio" do JSON' },
+        ],
+      },
+    ],
     examples: [
       { command: 'curl https://api.github.com', output: '{"current_user_url":"https://api.github.com/user",...}', explanation: 'GET simples — busca dados de uma API e mostra no terminal.' },
       { command: 'curl -X POST -d \'{"name":"enzo"}\' -H \'Content-Type: application/json\' https://httpbin.org/post', output: '{"json":{"name":"enzo"},...}', explanation: 'POST com corpo JSON e header Content-Type.' },

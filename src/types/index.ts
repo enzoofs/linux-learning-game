@@ -24,10 +24,17 @@ export interface BriefingExample {
   explanation: string;
 }
 
+export interface CommandBreakdown {
+  title: string;
+  command: string;
+  parts: { text: string; label: string }[];
+}
+
 export interface Briefing {
   concept: string;
   analogy: string;
   syntax: string;
+  commandBreakdowns?: CommandBreakdown[];
   examples: BriefingExample[];
 }
 

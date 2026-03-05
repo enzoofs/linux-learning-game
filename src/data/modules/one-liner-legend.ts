@@ -37,6 +37,42 @@ export const oneLinerLegendModule: Module = {
       'Imagine que voce e um maestro de orquestra. Ate agora, aprendeu a tocar cada instrumento individualmente — grep e o violino, awk e o piano, sed e o saxofone. Agora voce sobe ao podio e rege todos juntos em uma sinfonia. Um one-liner bem construido e como uma partitura: cada instrumento entra no momento certo, a saida de um alimenta o proximo, e o resultado final e pura harmonia.',
     syntax:
       'cmd1 && cmd2                    # run cmd2 only if cmd1 succeeds\ncmd1 || cmd2                    # run cmd2 only if cmd1 fails\ncmd1 ; cmd2                     # run both regardless\n$(command)                      # command substitution\ncmd | xargs other_cmd           # pipe as arguments\nxargs -I {} cmd {}              # place argument with {}\nfind . -exec cmd {} \\;          # run cmd on each found file\nfor f in *.ext; do cmd; done    # one-line loop\n2>&1                            # redirect stderr to stdout\n> /dev/null 2>&1                # silence all output',
+    commandBreakdowns: [
+      {
+        title: 'Encadeamento condicional',
+        command: "mkdir backup && cp *.log backup/ && echo 'Backup OK' || echo 'Falhou!'",
+        parts: [
+          { text: 'mkdir backup', label: 'Cria o diretório backup' },
+          { text: '&&', label: 'E-lógico: só executa o próximo se o anterior teve sucesso (exit code 0)' },
+          { text: 'cp *.log backup/', label: 'Copia todos os .log para backup/' },
+          { text: "&& echo 'Backup OK'", label: 'Só imprime se mkdir E cp funcionaram' },
+          { text: '||', label: 'OU-lógico: executa o próximo se o anterior FALHOU (exit code ≠ 0)' },
+          { text: "echo 'Falhou!'", label: 'Executado apenas se algum comando anterior falhou' },
+        ],
+      },
+      {
+        title: 'Substituição de comando — $(...)',
+        command: 'tar czf backup-$(date +%Y%m%d).tar.gz /var/log/',
+        parts: [
+          { text: 'tar czf', label: 'c = criar, z = comprimir com gzip, f = nome do arquivo' },
+          { text: 'backup-', label: 'Prefixo fixo do nome do arquivo' },
+          { text: '$(date +%Y%m%d)', label: 'Substituição: executa date e insere o resultado (ex: 20240315)' },
+          { text: '.tar.gz', label: 'Extensão do arquivo comprimido' },
+          { text: '/var/log/', label: 'Diretório a ser comprimido' },
+        ],
+      },
+      {
+        title: 'find com -exec',
+        command: "find . -name '*.tmp' -mtime +7 -exec rm {} \\;",
+        parts: [
+          { text: 'find .', label: 'Busca a partir do diretório atual' },
+          { text: "-name '*.tmp'", label: 'Filtro: apenas arquivos com extensão .tmp' },
+          { text: '-mtime +7', label: 'Filtro: modificados há mais de 7 dias' },
+          { text: '-exec rm {}', label: 'Executa rm para cada arquivo encontrado. {} = placeholder do arquivo' },
+          { text: '\\;', label: 'Marca o fim do comando -exec (precisa do \\\\ para escapar o ;)' },
+        ],
+      },
+    ],
     examples: [
       { command: "grep -c 'ERROR' server.log && echo 'Erros encontrados!'", output: '17\nErros encontrados!', explanation: 'Conta erros e, se houver algum (exit code 0), exibe a mensagem de confirmacao.' },
       { command: "echo \"Arquivos: $(ls *.csv | wc -l)\"", output: 'Arquivos: 3', explanation: 'Substituicao de comando: `$(...)` executa o comando interno e insere o resultado na string.' },

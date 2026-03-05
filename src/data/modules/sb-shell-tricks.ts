@@ -21,6 +21,19 @@ export const sbShellTricksModule: Module = {
       'Imagine que o terminal e um grimorio. Cada truque e um feitico que voce memoriza. `!!` e o feitico de repeticao — repete o ultimo encantamento. `$()` e o feitico de invocacao — captura o resultado de um feitico e o injeta em outro. Brace expansion e magia de multiplicacao — uma palavra vira varias.',
     syntax:
       '!!                    # repete o ultimo comando\n!$                    # ultimo argumento do comando anterior\necho {a,b,c}          # brace expansion\nls *.txt              # globbing com curinga\necho $(date)          # substituicao de comando\nCTRL+R                # busca reversa no historico',
+    commandBreakdowns: [
+      {
+        title: 'Expansão de chaves (brace expansion)',
+        command: 'cp config.yml{,.bak-$(date +%F)}',
+        parts: [
+          { text: 'cp', label: 'Copia arquivo' },
+          { text: 'config.yml{,.bak-$(date +%F)}', label: 'Expande para DOIS argumentos: config.yml e config.yml.bak-2024-03-15' },
+          { text: '{}', label: 'Chaves geram todas as combinações com o prefixo' },
+          { text: ',', label: 'Separa as variantes (vazio = original, .bak-... = backup)' },
+          { text: '$(date +%F)', label: 'Substituição: insere a data atual no nome do backup' },
+        ],
+      },
+    ],
     examples: [
       { command: 'echo hello', output: 'hello', explanation: 'Comando simples para configurar o historico.' },
       { command: '!!', output: 'hello', explanation: '`!!` repete o ultimo comando executado — neste caso, `echo hello`.' },

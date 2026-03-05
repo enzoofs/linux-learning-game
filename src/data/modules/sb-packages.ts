@@ -26,6 +26,20 @@ export const sbPackagesModule: Module = {
       'Pense no APT como um supermercado inteligente. `apt update` atualiza o catalogo de produtos. `apt install` coloca o produto no carrinho e cuida de trazer todos os ingredientes necessarios. `apt remove` devolve o produto. `apt autoremove` limpa a dispensa de coisas que ninguem mais usa.',
     syntax:
       'sudo apt update\nsudo apt install <pacote>\nsudo apt remove <pacote>\napt search <termo>\napt list --installed\ndpkg -l [padrao]\ndpkg -i <arquivo.deb>\napt-cache show <pacote>\nsudo apt autoremove',
+    commandBreakdowns: [
+      {
+        title: 'Ciclo de vida de um pacote',
+        command: 'sudo apt update && sudo apt install -y nginx',
+        parts: [
+          { text: 'sudo', label: 'Executa como superusuário (necessário para instalar pacotes)' },
+          { text: 'apt update', label: 'Atualiza a lista de pacotes disponíveis nos repositórios' },
+          { text: '&&', label: 'Só executa o próximo se o update teve sucesso' },
+          { text: 'apt install', label: 'Instala um ou mais pacotes' },
+          { text: '-y', label: 'Responde "sim" automaticamente (sem confirmação interativa)' },
+          { text: 'nginx', label: 'Nome do pacote a instalar' },
+        ],
+      },
+    ],
     examples: [
       { command: 'sudo apt update', output: 'Hit:1 http://archive.ubuntu.com/ubuntu jammy InRelease\nFetched 1,234 kB in 2s\nReading package lists... Done', explanation: 'Atualiza o indice de pacotes dos repositorios configurados.' },
       { command: 'sudo apt install htop', output: 'Reading package lists... Done\nThe following NEW packages will be installed:\n  htop\n0 upgraded, 1 newly installed, 0 to remove.\nSetting up htop (3.2.1-1) ...', explanation: 'Instala o pacote htop e todas as suas dependencias.' },

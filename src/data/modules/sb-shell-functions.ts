@@ -21,6 +21,20 @@ export const sbShellFunctionsModule: Module = {
       'O shell e como uma oficina de ferramentas. Aliases sao etiquetas nas ferramentas — voce cola o nome "martelo" num comando longo. Funcoes sao ferramentas customizadas que voce mesmo constroi. Variaveis de ambiente sao as configuracoes da oficina — iluminacao, temperatura, layout. E `source` e como apertar o botao de "atualizar" depois de mudar uma configuracao.',
     syntax:
       'alias nome=\'comando\'              # cria um alias\nunalias nome                        # remove um alias\nfunction nome() { comandos; }       # define uma funcao\nexport VAR=valor                    # exporta variavel\nsource ~/.bashrc                    # recarrega configuracao\necho $HOME $PATH $USER              # le variaveis de ambiente',
+    commandBreakdowns: [
+      {
+        title: 'Anatomia de uma função shell',
+        command: 'function backup() { tar czf ~/backup-$(date +%F).tar.gz "$@"; }',
+        parts: [
+          { text: 'function', label: 'Declara uma função (alternativa: backup() { ... } sem \'function\')' },
+          { text: 'backup()', label: 'Nome da função seguido de parênteses (não recebe args aqui)' },
+          { text: '{ ... }', label: 'Corpo da função — os comandos a executar' },
+          { text: 'tar czf', label: 'Cria (c) arquivo comprimido (z) com nome (f)' },
+          { text: '$(date +%F)', label: 'Substituição de comando: insere a data (ex: 2024-03-15)' },
+          { text: '"$@"', label: 'Todos os argumentos passados à função (ex: backup dir1 dir2)' },
+        ],
+      },
+    ],
     examples: [
       { command: "alias ll='ls -la'", output: '', explanation: 'Cria o alias `ll` que executa `ls -la` quando chamado.' },
       { command: 'll', output: 'total 40\ndrwxr-xr-x 8 enzo enzo 4096 ...', explanation: 'Agora `ll` funciona como `ls -la` — muito mais rapido de digitar.' },

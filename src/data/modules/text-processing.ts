@@ -28,6 +28,31 @@ export const textProcessingModule: Module = {
       '`grep` é como um marca-texto — encontra e mostra apenas as linhas que correspondem ao seu padrão. `sed` é como buscar-e-substituir turbinado — edita texto fluindo por um pipe sem nunca abrir um arquivo em um editor. `head` e `tail` são como espiar o topo ou o fundo de uma pilha de papéis.',
     syntax:
       'grep "pattern" file          # find lines matching pattern\ngrep -i "pattern" file       # case-insensitive search\ngrep -r "pattern" dir/       # recursive search in directory\ngrep -v "pattern" file       # show lines NOT matching\ngrep -n "pattern" file       # show line numbers\ngrep -c "pattern" file       # count matching lines\nhead -N file                 # show first N lines\ntail -N file                 # show last N lines\nwc -l file                   # count lines\nsed \'s/old/new/g\' file       # find and replace text',
+    commandBreakdowns: [
+      {
+        title: 'Anatomia da substituição com sed',
+        command: "sed 's/erro/error/g' log.txt",
+        parts: [
+          { text: 'sed', label: 'O comando — editor de stream, processa texto linha por linha' },
+          { text: 's', label: 'O subcomando de substituição (substitute)' },
+          { text: '/erro/', label: 'O padrão a ser buscado (aceita regex)' },
+          { text: '/error/', label: 'O texto de substituição' },
+          { text: '/g', label: "Flag 'global' — substitui TODAS as ocorrências na linha (sem /g, só a primeira)" },
+          { text: 'log.txt', label: 'O arquivo de entrada' },
+        ],
+      },
+      {
+        title: 'grep com regex',
+        command: "grep -rn 'function.*export' src/",
+        parts: [
+          { text: 'grep', label: 'Busca linhas que correspondem a um padrão' },
+          { text: '-r', label: 'Recursivo — busca em todos os arquivos dentro do diretório' },
+          { text: '-n', label: 'Mostra o número da linha de cada resultado' },
+          { text: "'function.*export'", label: 'Regex: "function", seguido de qualquer coisa (.*), seguido de "export"' },
+          { text: 'src/', label: 'O diretório onde buscar' },
+        ],
+      },
+    ],
     examples: [
       { command: "grep 'error' log.txt", output: '2024-03-01 10:05:02 error: connection refused\n2024-03-01 10:12:45 error: timeout exceeded\n2024-03-01 10:30:18 error: disk full', explanation: 'Encontra todas as linhas contendo "error" em log.txt. A busca é case-sensitive por padrão.' },
       { command: "grep -i 'warning' log.txt", output: '2024-03-01 10:03:11 WARNING: disk usage at 85%\n2024-03-01 10:20:33 Warning: deprecated API call', explanation: 'Busca case-insensitive. Encontra "WARNING", "Warning", "warning", etc.' },

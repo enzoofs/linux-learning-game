@@ -15,7 +15,7 @@ interface BriefingProps {
 
 export function Briefing({ title, briefing, onStartTraining, onStartChallenge, isOverlay, onClose, onContinue }: BriefingProps) {
   return (
-    <div className={`p-6 ${isOverlay ? 'max-h-[60vh]' : 'max-h-[70vh]'} overflow-y-auto`}>
+    <div className="p-6">
       <div className="text-lg font-bold text-cyan-400 mb-1 tracking-wide">
         📖 EXPLICAÇÃO: {title.toUpperCase()}
       </div>
@@ -36,6 +36,29 @@ export function Briefing({ title, briefing, onStartTraining, onStartChallenge, i
           {briefing.syntax}
         </pre>
       </div>
+
+      {/* Command anatomy breakdowns */}
+      {briefing.commandBreakdowns && briefing.commandBreakdowns.length > 0 && (
+        <div className="mb-6">
+          <div className="text-xs text-slate-500 font-semibold mb-3">ANATOMIA DO COMANDO</div>
+          <div className="space-y-4">
+            {briefing.commandBreakdowns.map((bd, i) => (
+              <div key={i} className="bg-[#0f172a] rounded-lg p-4 border border-purple-500/20">
+                <div className="text-xs text-purple-400 font-semibold mb-2">{bd.title}</div>
+                <pre className="text-cyan-300 text-sm font-mono mb-3 overflow-x-auto">{bd.command}</pre>
+                <div className="space-y-1.5">
+                  {bd.parts.map((part, j) => (
+                    <div key={j} className="flex items-start gap-2 text-xs">
+                      <code className="text-amber-400 font-mono whitespace-nowrap bg-amber-400/10 px-1.5 py-0.5 rounded">{part.text}</code>
+                      <span className="text-slate-400">{part.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mb-6">
         <div className="text-xs text-slate-500 font-semibold mb-3">EXEMPLOS</div>

@@ -23,6 +23,20 @@ export const sbHardeningModule: Module = {
       'Pense no hardening como fortificar um castelo. O `ufw` e a muralha que decide quem entra e quem fica de fora. O `fail2ban` e o guarda que bane invasores reincidentes. O `openssl` e o selo real que garante a autenticidade das mensagens. E o `sshd_config` e o portao principal — voce precisa configurar quem tem a chave.',
     syntax:
       'sudo ufw status\nsudo ufw allow <porta>/<protocolo>\nsudo ufw deny <porta>\nsudo ufw enable\nfail2ban-client status\nopenssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes\nopenssl s_client -connect host:porta\nss -tlnp\nsudo cat /etc/shadow',
+    commandBreakdowns: [
+      {
+        title: 'Configurando firewall com ufw',
+        command: 'sudo ufw allow from 192.168.1.0/24 to any port 22 proto tcp',
+        parts: [
+          { text: 'sudo ufw', label: 'Uncomplicated Firewall — interface simplificada para iptables' },
+          { text: 'allow', label: 'Ação: permitir tráfego (outras: deny, reject, delete)' },
+          { text: 'from 192.168.1.0/24', label: 'Origem: apenas IPs da rede 192.168.1.x (/24 = 256 IPs)' },
+          { text: 'to any', label: 'Destino: qualquer endereço local' },
+          { text: 'port 22', label: 'Porta de destino: SSH (22)' },
+          { text: 'proto tcp', label: 'Protocolo: TCP (outro comum: udp)' },
+        ],
+      },
+    ],
     examples: [
       { command: 'sudo ufw status', output: 'Status: active\n\nTo                         Action      From\n--                         ------      ----\n22/tcp                     ALLOW       Anywhere\n443/tcp                    ALLOW       Anywhere\n80/tcp                     DENY        Anywhere', explanation: 'Mostra o status do firewall e todas as regras ativas.' },
       { command: 'sudo ufw allow 443/tcp', output: 'Rule added\nRule added (v6)', explanation: 'Libera a porta 443 (HTTPS) no firewall para conexoes TCP.' },

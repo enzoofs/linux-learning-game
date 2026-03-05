@@ -22,6 +22,30 @@ export const sbNetworkingModule: Module = {
       'Imagine a rede como um sistema de correios. `ip addr` mostra o endereço da sua casa. `ip route` mostra qual caminho o carteiro usa. `ping` é como enviar uma carta e esperar confirmação de recebimento. `traceroute` rastreia cada agência por onde a carta passou. `dig` consulta a lista telefônica (DNS) para traduzir nomes em endereços.',
     syntax:
       'ip addr [show]\nip route [show]\nss [-tulnp]\nping [-c count] host\ntraceroute host\ndig domain\nnslookup domain\nhost domain\nnc [-zv] host port',
+    commandBreakdowns: [
+      {
+        title: 'Anatomia do ss (Socket Statistics)',
+        command: 'ss -tulnp',
+        parts: [
+          { text: 'ss', label: 'Socket Statistics — substituto moderno do netstat' },
+          { text: '-t', label: 'Mostra conexões TCP' },
+          { text: '-u', label: 'Mostra conexões UDP' },
+          { text: '-l', label: 'Apenas sockets em estado LISTEN (esperando conexões)' },
+          { text: '-n', label: 'Numérico — mostra portas como números (não resolve nomes de serviço)' },
+          { text: '-p', label: 'Mostra o processo associado a cada socket (requer sudo para todos)' },
+        ],
+      },
+      {
+        title: 'Consulta DNS com dig',
+        command: 'dig +short MX google.com',
+        parts: [
+          { text: 'dig', label: 'Domain Information Groper — ferramenta de consulta DNS' },
+          { text: '+short', label: 'Formato resumido — mostra apenas a resposta, sem headers' },
+          { text: 'MX', label: 'Tipo de registro DNS (MX = Mail Exchange; outros: A, AAAA, CNAME, NS, TXT)' },
+          { text: 'google.com', label: 'O domínio a consultar' },
+        ],
+      },
+    ],
     examples: [
       { command: 'ip addr show', output: '1: lo: <LOOPBACK> ... inet 127.0.0.1/8\n2: eth0: ... inet 192.168.1.50/24', explanation: 'Mostra todas as interfaces de rede e seus endereços IP.' },
       { command: 'ip route show', output: 'default via 192.168.1.1 dev eth0\n192.168.1.0/24 dev eth0 proto kernel', explanation: 'Exibe a tabela de rotas — o gateway padrão é 192.168.1.1.' },

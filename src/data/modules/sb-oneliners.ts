@@ -22,6 +22,33 @@ export const sbOnelinersModule: Module = {
       'Pense em one-liners como receitas de cozinha relampago. Cada comando e um ingrediente, o pipe `|` e a esteira da cozinha industrial, e o resultado final e um prato gourmet — tudo preparado em uma unica linha de montagem sem pausas.',
     syntax:
       'comando1 | comando2 | comando3\ncomando | awk \'{print $N}\' | sort | uniq -c\ncomando | sed \'s/antigo/novo/g\'\nwhile read line; do comando "$line"; done < arquivo\ndiff <(comando1) <(comando2)\n{ cmd1; cmd2; } | cmd3\ncomando | xargs -P 4 -I {} cmd {}',
+    commandBreakdowns: [
+      {
+        title: 'Pipeline de análise de logs',
+        command: "cat access.log | awk '{print $1}' | sort | uniq -c | sort -rn | head -10",
+        parts: [
+          { text: 'cat access.log', label: 'Lê o arquivo de log' },
+          { text: "awk '{print $1}'", label: 'Extrai o primeiro campo de cada linha (o IP)' },
+          { text: 'sort', label: 'Ordena os IPs (necessário para uniq)' },
+          { text: 'uniq -c', label: 'Conta ocorrências consecutivas de cada IP' },
+          { text: 'sort -rn', label: 'Ordena numericamente em ordem decrescente' },
+          { text: 'head -10', label: 'Mostra apenas os 10 IPs mais frequentes' },
+        ],
+      },
+      {
+        title: 'Loop inline com while read',
+        command: "cat urls.txt | while read url; do curl -sL -o /dev/null -w '%{http_code} %{url}\\n' \"$url\"; done",
+        parts: [
+          { text: 'cat urls.txt', label: 'Lista de URLs (uma por linha)' },
+          { text: 'while read url; do', label: 'Loop: lê cada linha na variável $url' },
+          { text: 'curl -sL', label: 'Silent + follow redirects' },
+          { text: '-o /dev/null', label: 'Descarta o corpo da resposta' },
+          { text: "-w '%{http_code} %{url}\\n'", label: 'Formato da saída: código HTTP + URL' },
+          { text: '"$url"', label: 'A URL da iteração atual (entre aspas para espaços)' },
+          { text: 'done', label: 'Fim do loop while' },
+        ],
+      },
+    ],
     examples: [
       { command: 'ps aux | awk \'{print $11}\' | sort | uniq -c | sort -rn | head -5', output: '   42 /usr/bin/python3\n   15 /usr/sbin/apache2\n   8 /usr/bin/node\n   3 /usr/sbin/sshd\n   2 /usr/bin/bash', explanation: 'Conta os processos mais comuns no sistema — pipe de 5 comandos.' },
       { command: 'cat access.log | awk \'{print $1}\' | sort | uniq -c | sort -rn | head -3', output: '  1523 192.168.1.100\n   847 10.0.0.50\n   234 172.16.0.1', explanation: 'Extrai os IPs mais frequentes de um log de acesso.' },

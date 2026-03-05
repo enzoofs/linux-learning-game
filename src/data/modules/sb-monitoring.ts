@@ -24,6 +24,17 @@ export const sbMonitoringModule: Module = {
       'Pense no sistema como um corpo humano. `top` é o monitor cardíaco — mostra tudo em tempo real. `free` mede a "pressão arterial" da memória. `uptime` diz há quanto tempo o paciente está acordado e quão sobrecarregado está. `iostat` verifica o "fluxo sanguíneo" dos discos. `/proc/cpuinfo` é o raio-X do processador.',
     syntax:
       'top\nhtop\nfree [-h]\nuptime\nvmstat [interval] [count]\niostat [-x] [interval] [count]\ncat /proc/cpuinfo\ncat /proc/meminfo\nlscpu\nnproc',
+    commandBreakdowns: [
+      {
+        title: 'Interpretando a saída do free',
+        command: 'free -h --si',
+        parts: [
+          { text: 'free', label: 'Mostra uso de memória RAM e swap do sistema' },
+          { text: '-h', label: 'Human-readable: mostra em KB, MB, GB' },
+          { text: '--si', label: 'Usa base 10 (1 GB = 1000 MB) em vez de base 2 (1 GiB = 1024 MiB)' },
+        ],
+      },
+    ],
     examples: [
       { command: 'free -h', output: '              total    used    free   shared  buff/cache  available\nMem:          15Gi    4.2Gi   8.1Gi   256Mi      3.1Gi      10Gi\nSwap:         2.0Gi      0B   2.0Gi', explanation: 'Mostra uso de memória em formato legível (-h = human readable).' },
       { command: 'uptime', output: ' 14:30:25 up 42 days, 3:15,  2 users,  load average: 0.52, 0.38, 0.31', explanation: 'Mostra tempo de atividade e load average dos últimos 1, 5 e 15 minutos.' },

@@ -24,6 +24,19 @@ export const sbPermissionsModule: Module = {
       'Pense nas permissoes como um predio com tres tipos de chave: a chave do morador (usuario), a chave do andar (grupo) e a chave do visitante (outros). O `chmod` troca as fechaduras, o `chown` muda o nome na porta, e o `sudo` e o cartao-mestre do zelador.',
     syntax:
       'chmod [octal|simbolico] arquivo\nchown usuario[:grupo] arquivo\nchgrp grupo arquivo\numask [mascara]\nsudo comando\nsu [usuario]',
+    commandBreakdowns: [
+      {
+        title: 'Anatomia do chmod octal',
+        command: 'chmod 755 script.sh',
+        parts: [
+          { text: 'chmod', label: 'Change Mode — altera as permissões de acesso de um arquivo' },
+          { text: '7', label: 'Dono (user): 4(ler) + 2(escrever) + 1(executar) = rwx' },
+          { text: '5', label: 'Grupo: 4(ler) + 0 + 1(executar) = r-x' },
+          { text: '5', label: 'Outros: 4(ler) + 0 + 1(executar) = r-x' },
+          { text: 'script.sh', label: 'O arquivo alvo' },
+        ],
+      },
+    ],
     examples: [
       { command: 'chmod 755 script.sh', output: '', explanation: 'Define rwx para o dono, r-x para grupo e outros. Ideal para scripts executaveis.' },
       { command: 'chmod 644 config.txt', output: '', explanation: 'Define rw- para o dono, r-- para grupo e outros. Padrao para arquivos de texto.' },

@@ -36,6 +36,30 @@ export const systemAdminModule: Module = {
       'Pense no sysadmin como o zelador de um prédio. `whoami` é seu crachá, `df` verifica quanto espaço tem nos armários, `free` monitora a energia disponível, `systemctl` liga e desliga os equipamentos, e `export` coloca avisos no mural para todos lerem.',
     syntax:
       'whoami                       # who am I?\nid                           # UID, GID and groups\nuseradd nome                 # create user (needs root)\nusermod -aG grupo usuario    # add user to group\npasswd usuario               # change password\nuname -a                     # kernel and system info\nhostname                     # show hostname\nuptime                       # uptime and load average\nfree -h                      # memory usage (human-readable)\ndf -h                        # disk space (human-readable)\ndu -sh dir                   # directory size\nsystemctl status service     # check service status\nsystemctl start service      # start a service\nsystemctl stop service       # stop a service\nsystemctl restart service    # restart a service\nenv                          # list environment variables\necho $VAR                    # print a variable\nexport VAR=value             # set environment variable',
+    commandBreakdowns: [
+      {
+        title: 'Anatomia do systemctl',
+        command: 'sudo systemctl restart nginx.service',
+        parts: [
+          { text: 'sudo', label: 'Executa como superusuário (necessário para gerenciar serviços)' },
+          { text: 'systemctl', label: 'Controlador do systemd — gerencia serviços do sistema' },
+          { text: 'restart', label: 'Ação: para e inicia o serviço (outras: start, stop, status, enable, disable)' },
+          { text: 'nginx.service', label: 'Nome da unidade/serviço (o .service é opcional)' },
+        ],
+      },
+      {
+        title: 'Análise de uso de disco',
+        command: 'du -sh /var/log/* | sort -rh | head -5',
+        parts: [
+          { text: 'du', label: 'Disk Usage — mostra o tamanho de arquivos/diretórios' },
+          { text: '-s', label: 'Summary — mostra apenas o total de cada argumento (não lista subdiretórios)' },
+          { text: '-h', label: 'Human-readable — mostra em KB, MB, GB em vez de bytes' },
+          { text: '/var/log/*', label: 'Expande para todos os itens dentro de /var/log/' },
+          { text: '| sort -rh', label: 'Ordena: -r = reverso (maior primeiro), -h = entende sufixos humanos (10G > 500M)' },
+          { text: '| head -5', label: 'Mostra apenas os 5 maiores' },
+        ],
+      },
+    ],
     examples: [
       { command: 'whoami', output: 'enzo', explanation: 'Mostra o nome do usuário logado no terminal.' },
       { command: 'id', output: 'uid=1000(enzo) gid=1000(enzo) groups=1000(enzo),27(sudo),999(docker)', explanation: 'Mostra o UID, GID e todos os grupos do usuário atual. Útil para verificar permissões.' },
