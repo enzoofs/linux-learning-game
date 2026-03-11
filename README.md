@@ -1,73 +1,79 @@
-# React + TypeScript + Vite
+# Art of CLI Quest
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Plataforma gamificada para aprender terminal Linux — skill trees, boss fights e drills, do básico ao Docker.
 
-Currently, two official plugins are available:
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6)
+![React](https://img.shields.io/badge/React-19-61DAFB)
+![Vite](https://img.shields.io/badge/Vite-7.3-646CFF)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Funcionalidades
 
-## React Compiler
+- **24 módulos** — do `ls` ao Docker, organizados em 8 tiers (Recruit → GrandMaster)
+- **Loop de aprendizado** — Briefing → Sandbox → Drills → Boss Challenge por módulo
+- **Skill tree visual** — grafo SVG com dependências entre módulos
+- **Sistema de XP** — multiplier por streak (1.5x em 7 dias, 2x em 30 dias)
+- **Boss challenges** — cenários multi-step que testam tudo do módulo
+- **Sandbox** — ambiente livre com 20+ comandos pré-configurados por módulo
+- **Achievements** — 10+ conquistas desbloqueáveis
+- **Shop** — skins, equipamentos e temas compráveis com XP
+- **Avatar pixel art** — customização estilo RPG com sprite sheets
+- **Assistente IA** — chat contextual com OpenAI (opcional)
+- **Filesystem virtual** — simula estrutura Linux real para prática
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Módulos
 
-## Expanding the ESLint configuration
+### Base (Recruit → Commander)
+`cli-basics` → `files-navigation` → `pipes-streams` → `process-mgmt` → `text-processing` → `data-wrangling` → `system-admin` → `one-liner-legend`
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Secret Book (Initiate → GrandMaster)
+Shell tricks, functions, find avançado, permissões, Vim, tmux, curl, SSH, disco, networking, Git, monitoramento, cron, logs, Docker, hardening
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+| Componente | Tecnologia |
+|---|---|
+| Framework | React 19 + TypeScript |
+| Build | Vite 7.3 |
+| Estilo | Tailwind CSS 4.2 |
+| Animações | Framer Motion |
+| Estado | Zustand (persistido em localStorage) |
+| Testes | Vitest + Testing Library |
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Setup
+
+```bash
+npm install
+npm run dev      # Dev server com HMR
+npm run build    # Build para produção
+npm run test     # Rodar testes
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Como funciona
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Cada módulo segue o loop:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. **Briefing** — conceito explicado com analogia, sintaxe e exemplos
+2. **Sandbox** — terminal livre para experimentar os comandos
+3. **Drills** — exercícios progressivos (easy → hard) com hints
+4. **Boss** — desafio final com cenário real e múltiplos passos
+
+O progresso salva automaticamente no `localStorage`. Sem backend necessário.
+
+## Estrutura
+
+```
+src/
+├── components/
+│   ├── ModulePlayer/    # Orquestrador do loop de aprendizado
+│   ├── Terminal/        # Display do terminal
+│   ├── SkillTree/       # Grafo visual de módulos
+│   ├── Shop/            # Loja de itens
+│   └── Achievements/    # Sistema de conquistas
+├── data/
+│   └── modules/         # 24 módulos com briefing, sandbox, drills e boss
+├── stores/
+│   └── gameStore.ts     # Estado central (XP, progresso, inventário)
+└── utils/
+    ├── commandParser.ts # Validação de comandos + detecção de typos
+    └── virtualFS.ts     # Filesystem virtual simulado
 ```
