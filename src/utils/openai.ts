@@ -64,6 +64,19 @@ export async function sendChatMessage(
     throw new Error(`API_ERROR_${response.status}`);
   }
 
-  const data = await response.json();
-  return data.choices[0].message.content;
+  let data: Record<string, unknown>;
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error('API_RESPONSE_PARSE_ERROR');
+  }
+
+  const choices = data?.choices as { message?: { content?: string } }[] | undefined;
+  const content = choices?.[0]?.message?.content;
+
+  if (!content) {
+    throw new Error('API_RESPONSE_EMPTY');
+  }
+
+  return content;
 }

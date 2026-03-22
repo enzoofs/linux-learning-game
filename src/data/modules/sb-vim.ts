@@ -35,7 +35,7 @@ export const sbVimModule: Module = {
       { command: 'dd', output: '(linha deletada)', explanation: 'No modo Normal, deleta a linha inteira onde o cursor esta.' },
       { command: '/error', output: '/error', explanation: 'Busca a palavra "error" no arquivo. Use `n` para ir para a proxima ocorrencia.' },
       { command: ':%s/http/https/g', output: '5 substituicoes em 3 linhas', explanation: 'Substitui todas as ocorrencias de "http" por "https" no arquivo inteiro.' },
-      { command: ':wq', output: '(arquivo salvo e Vim fechado)', explanation: 'Salva o arquivo e sai do Vim. O atalho equivalente e `ZZ`.' },
+      { command: ':wq', output: '(arquivo salvo e Vim fechado)', explanation: 'Salva o arquivo e sai do Vim. O atalho `ZZ` e equivalente a `:x` (salva apenas se houve alteracao).' },
     ],
   },
 

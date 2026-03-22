@@ -56,7 +56,7 @@ function App() {
           lifetimeXP: 50000,
           spendableXP: 50000,
         });
-        console.log(`✅ Desbloqueados ${allModuleIds.length} módulos + Secret Book + 50k XP`);
+        if (import.meta.env.DEV) console.log(`Desbloqueados ${allModuleIds.length} modulos + Secret Book + 50k XP`);
       },
       lockAll: () => {
         useGameStore.setState({
@@ -68,7 +68,7 @@ function App() {
           lifetimeXP: 0,
           spendableXP: 0,
         });
-        console.log('🔒 Tudo bloqueado, progresso resetado.');
+        if (import.meta.env.DEV) console.log('Tudo bloqueado, progresso resetado.');
       },
     };
   }, []);

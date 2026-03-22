@@ -14,7 +14,39 @@ export interface CommandResult {
   isError: boolean;
 }
 
-const DATE_STRING = 'Mar 03 10:00';
+// Timestamps variados para simular datas reais no ls -l
+const FILE_DATES: Record<string, string> = {
+  'Desktop':    'Jan 15 09:00',
+  'Documents':  'Mar 02 14:30',
+  'Downloads':  'Mar 18 08:15',
+  'Music':      'Feb 10 11:00',
+  'Pictures':   'Mar 01 16:45',
+  'scripts':    'Mar 20 10:00',
+  '.bashrc':    'Jan 01 00:00',
+  '.profile':   'Jan 01 00:00',
+  '.ssh':       'Feb 05 12:30',
+  'readme.txt': 'Mar 02 14:30',
+  'hello.sh':   'Mar 15 09:22',
+};
+const DEFAULT_DATE = 'Mar 03 10:00';
+
+function getFileDate(name: string): string {
+  return FILE_DATES[name] ?? DEFAULT_DATE;
+}
+
+// Permissoes variadas para ensinar conceitos de chmod
+const FILE_PERMS: Record<string, string> = {
+  '.ssh':     'drwx------',
+  '.bashrc':  '-rw-------',
+  '.profile': '-rw-r--r--',
+  'hello.sh': '-rwxr-xr-x',
+};
+const DEFAULT_DIR_PERMS = 'drwxr-xr-x';
+const DEFAULT_FILE_PERMS = '-rw-r--r--';
+
+function getFilePerms(name: string, type: 'file' | 'directory'): string {
+  return FILE_PERMS[name] ?? (type === 'directory' ? DEFAULT_DIR_PERMS : DEFAULT_FILE_PERMS);
+}
 
 function createDefaultFS(): FSNode {
   return {
@@ -184,9 +216,10 @@ export class VirtualFS {
 
     if (longFormat) {
       const lines = items.map((item) => {
-        const perms = item.type === 'directory' ? 'drwxr-xr-x' : '-rw-r--r--';
+        const perms = getFilePerms(item.name, item.type);
         const size = item.type === 'directory' ? '4096' : String(item.content?.length ?? 0);
-        return `${perms}  enzo enzo  ${size.padStart(5)}  ${DATE_STRING}  ${item.name}`;
+        const date = getFileDate(item.name);
+        return `${perms}  enzo enzo  ${size.padStart(5)}  ${date}  ${item.name}`;
       });
       return { handled: true, output: lines.join('\n'), isError: false };
     }

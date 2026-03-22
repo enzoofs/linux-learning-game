@@ -10,6 +10,11 @@ import { VirtualFS } from '../../utils/virtualFS';
 
 type GameMode = 'training' | 'challenge';
 
+const FIRST_TRY_BONUS_XP = 25;
+const NEXT_PHASE_DELAY_MS = 1500;
+const MODULE_COMPLETE_DELAY_MS = 3000;
+const BASE_MODULE_IDS = ['cli-basics', 'pipes-streams', 'files-nav', 'process-mgmt', 'text-processing', 'data-wrangling'];
+
 // Bob Ross encouragement quotes — shown after repeated failures
 const BOB_ROSS_QUOTES = [
   '"Não existem erros, apenas pequenos acidentes felizes." — Bob Ross',
@@ -161,6 +166,31 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
   }, [phase, currentDrillIndex, currentBossStep]);
 
   // Handle 'brief' command across all phases
+  // Shared fallback: try VFS, then learned commands, then generic error
+  const handleFallbackCommand = useCallback((cmd: string, errorMessage: string) => {
+    const vfsResult = vfsRef.current.executeCommand(cmd);
+    if (vfsResult.handled) {
+      if (vfsResult.output) {
+        terminal.addLine({ type: 'output', text: vfsResult.output });
+      }
+      terminal.addLine({ type: 'learned', text: 'Comando reconhecido, mas nao e a resposta para este exercicio.' });
+      updateCwd();
+      return;
+    }
+    const { completedModules } = useGameStore.getState();
+    const learnedCommands = getLearnedCommands(completedModules);
+    for (const learnedCmd of learnedCommands) {
+      if (learnedCmd.pattern.test(cmd)) {
+        if (learnedCmd.output) {
+          terminal.addLine({ type: 'output', text: learnedCmd.output });
+        }
+        terminal.addLine({ type: 'learned', text: 'Comando reconhecido, mas nao e a resposta para este exercicio.' });
+        return;
+      }
+    }
+    terminal.addLine({ type: 'error', text: errorMessage });
+  }, [terminal, updateCwd]);
+
   const handleBriefCommand = useCallback((): boolean => {
     if (gameMode === 'challenge') {
       terminal.addLine({ type: 'system', text: 'Modo Desafio: instruções desativadas.' });
@@ -342,7 +372,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
       });
 
       if (!usedHint && drillAttempts === 0) {
-        const bonusXp = xpBoostActive ? 50 : 25;
+        const bonusXp = xpBoostActive ? FIRST_TRY_BONUS_XP * 2 : FIRST_TRY_BONUS_XP;
         terminal.addLine({ type: 'levelup', text: `BÔNUS DE PRIMEIRA! +${bonusXp} XP${xpBoostActive ? ' (Boost x2!)' : ''}` });
         addXP(bonusXp);
       }
@@ -355,39 +385,13 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
         } else {
           setPhase('boss');
         }
-      }, 1500);
+      }, NEXT_PHASE_DELAY_MS);
     } else if (result.type === 'feedback') {
       terminal.addLine({ type: 'feedback', text: result.message });
     } else if (result.type === 'typo') {
       terminal.addLine({ type: 'feedback', text: result.message });
     } else {
-      // Try VFS first
-      const vfsResult = vfsRef.current.executeCommand(cmd);
-      if (vfsResult.handled) {
-        if (vfsResult.output) {
-          terminal.addLine({ type: 'output', text: vfsResult.output });
-        }
-        terminal.addLine({ type: 'learned', text: 'Comando reconhecido, mas não é a resposta para este exercício.' });
-        updateCwd();
-      } else {
-        // Then check learned commands before showing generic error
-        const { completedModules } = useGameStore.getState();
-        const learnedCommands = getLearnedCommands(completedModules);
-        let isLearned = false;
-        for (const learnedCmd of learnedCommands) {
-          if (learnedCmd.pattern.test(cmd)) {
-            if (learnedCmd.output) {
-              terminal.addLine({ type: 'output', text: learnedCmd.output });
-            }
-            terminal.addLine({ type: 'learned', text: 'Comando reconhecido, mas não é a resposta para este exercício.' });
-            isLearned = true;
-            break;
-          }
-        }
-        if (!isLearned) {
-          terminal.addLine({ type: 'error', text: result.message });
-        }
-      }
+      handleFallbackCommand(cmd, result.message);
     }
 
     // Bob Ross encouragement after 3+ failed attempts (every 2 attempts)
@@ -398,7 +402,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     }
 
     terminal.setInputValue('');
-  }, [terminal, currentDrill, currentDrillIndex, drillAttempts, drillStartTime, usedHint, module, addXP, completeDrill, updateCwd, handleBriefCommand, gameMode, xpBoostActive, scheduleTimeout]);
+  }, [terminal, currentDrill, currentDrillIndex, drillAttempts, drillStartTime, usedHint, module, addXP, completeDrill, updateCwd, handleBriefCommand, handleFallbackCommand, gameMode, xpBoostActive, scheduleTimeout]);
 
   const handleBossSubmit = useCallback(() => {
     const cmd = terminal.inputValue.trim();
@@ -460,7 +464,6 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
         }
 
         // Check if all base modules are now complete — trigger Secret Book reveal
-        const BASE_MODULE_IDS = ['cli-basics', 'pipes-streams', 'files-nav', 'process-mgmt', 'text-processing', 'data-wrangling'];
         const storeState = useGameStore.getState();
         const updatedCompleted = [...storeState.completedModules, module.id];
         const allBaseComplete = BASE_MODULE_IDS.every(id => updatedCompleted.includes(id));
@@ -492,39 +495,13 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
           scheduleTimeout(() => {
             setPhase('completed');
             onModuleComplete();
-          }, 3000);
+          }, MODULE_COMPLETE_DELAY_MS);
         }
       }
     } else if (result.type === 'feedback') {
       terminal.addLine({ type: 'feedback', text: result.message });
     } else {
-      // Try VFS first
-      const vfsResult = vfsRef.current.executeCommand(cmd);
-      if (vfsResult.handled) {
-        if (vfsResult.output) {
-          terminal.addLine({ type: 'output', text: vfsResult.output });
-        }
-        terminal.addLine({ type: 'learned', text: 'Comando reconhecido, mas não é a resposta para este exercício.' });
-        updateCwd();
-      } else {
-        // Then check learned commands before showing generic error
-        const { completedModules } = useGameStore.getState();
-        const learnedCommands = getLearnedCommands(completedModules);
-        let isLearned = false;
-        for (const learnedCmd of learnedCommands) {
-          if (learnedCmd.pattern.test(cmd)) {
-            if (learnedCmd.output) {
-              terminal.addLine({ type: 'output', text: learnedCmd.output });
-            }
-            terminal.addLine({ type: 'learned', text: 'Comando reconhecido, mas não é a resposta para este exercício.' });
-            isLearned = true;
-            break;
-          }
-        }
-        if (!isLearned) {
-          terminal.addLine({ type: 'error', text: result.message });
-        }
-      }
+      handleFallbackCommand(cmd, result.message);
     }
 
     // Bob Ross encouragement after 3+ failed attempts on boss (every 2 attempts)
@@ -535,7 +512,7 @@ export function ModulePlayer({ module, onModuleComplete }: ModulePlayerProps) {
     }
 
     terminal.setInputValue('');
-  }, [terminal, currentBoss, currentBossStep, module, addXP, completeBoss, completeModule, addFreezeToken, clearSession, onModuleComplete, updateCwd, handleBriefCommand, gameMode, isAlreadyCompleted, xpBoostActive, scheduleTimeout, completedModules, bossAttempts]);
+  }, [terminal, currentBoss, currentBossStep, module, addXP, completeBoss, completeModule, addFreezeToken, clearSession, onModuleComplete, updateCwd, handleBriefCommand, handleFallbackCommand, gameMode, isAlreadyCompleted, xpBoostActive, scheduleTimeout, completedModules, bossAttempts]);
 
   const handleSubmit = useCallback(() => {
     if (phase === 'sandbox') handleSandboxSubmit();

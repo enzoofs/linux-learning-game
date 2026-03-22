@@ -35,7 +35,7 @@ export const cliBasicsModule: Module = {
       { pattern: /^ls$/, output: 'Desktop  Documents  Downloads  Music  Pictures  scripts  .bashrc  .profile' },
       { pattern: /^ls\s+-l/, output: 'total 32\ndrwxr-xr-x 2 enzo enzo 4096 Mar 01 09:00 Desktop\ndrwxr-xr-x 5 enzo enzo 4096 Mar 02 14:30 Documents\ndrwxr-xr-x 2 enzo enzo 4096 Mar 03 08:15 Downloads\ndrwxr-xr-x 2 enzo enzo 4096 Feb 28 11:00 Music\ndrwxr-xr-x 3 enzo enzo 4096 Mar 01 16:45 Pictures\ndrwxr-xr-x 2 enzo enzo 4096 Mar 03 10:00 scripts\n-rw-r--r-- 1 enzo enzo  220 Jan 01 00:00 .bashrc\n-rw-r--r-- 1 enzo enzo  807 Jan 01 00:00 .profile' },
       { pattern: /^ls\s+-a/, output: '.  ..  .bashrc  .profile  .ssh  Desktop  Documents  Downloads  Music  Pictures  scripts' },
-      { pattern: /^cd\s+\w+/, output: '' },
+      { pattern: /^cd\s+\S+/, output: '' },
       { pattern: /^cd$/, output: '' },
       { pattern: /^mkdir\s+/, output: '' },
       { pattern: /^whoami$/, output: 'enzo' },

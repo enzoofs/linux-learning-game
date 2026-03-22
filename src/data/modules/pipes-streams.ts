@@ -40,9 +40,10 @@ export const pipesStreamsModule: Module = {
 
   sandbox: {
     commands: [
-      { pattern: /^echo\s+['"](.+?)['"]\s*$/, output: '$1', description: 'Print text to stdout' },
-      { pattern: /^echo\s+['"](.+?)['"]\s*>\s*\S+/, output: '', description: 'Write text to a file (overwrite)' },
-      { pattern: /^echo\s+['"](.+?)['"]\s*>>\s*\S+/, output: '', description: 'Append text to a file' },
+      { pattern: /^echo\s+['"](.+?)['"]\s*$/, output: '$1', description: 'Print text to stdout (quoted)' },
+      { pattern: /^echo\s+([^'">|]+)\s*$/, output: '$1', description: 'Print text to stdout (unquoted)' },
+      { pattern: /^echo\s+['"]?(.+?)['"]?\s*>\s*\S+/, output: '', description: 'Write text to a file (overwrite)' },
+      { pattern: /^echo\s+['"]?(.+?)['"]?\s*>>\s*\S+/, output: '', description: 'Append text to a file' },
       { pattern: /^cat\s+hello\.txt$/, output: 'Hello Linux', description: 'Read hello.txt' },
       { pattern: /^cat\s+access\.log$/, output: '2024-03-01 10:00:01 INFO  Request GET /index.html 200\n2024-03-01 10:00:02 ERROR Request GET /api/users 500\n2024-03-01 10:00:03 INFO  Request POST /api/login 200\n2024-03-01 10:00:04 WARN  Request GET /old-page 301\n2024-03-01 10:00:05 ERROR Request GET /api/data 503\n2024-03-01 10:00:06 INFO  Request GET /about 200\n2024-03-01 10:00:07 ERROR Request POST /api/submit 500\n2024-03-01 10:00:08 INFO  Request GET /style.css 200\n2024-03-01 10:00:09 ERROR Request GET /api/config 502\n2024-03-01 10:00:10 INFO  Request GET /favicon.ico 200', description: 'Read the access log' },
       { pattern: /^cat\s+\/etc\/passwd$/, output: 'root:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nbin:x:2:2:bin:/bin:/usr/sbin/nologin\nsys:x:3:3:sys:/dev:/usr/sbin/nologin\nwww-data:x:33:33:www-data:/var/www:/usr/sbin/nologin\nenzo:x:1000:1000:Enzo:/home/enzo:/bin/bash', description: 'Read the passwd file' },

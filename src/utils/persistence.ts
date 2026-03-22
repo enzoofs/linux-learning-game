@@ -13,8 +13,10 @@ export function loadState<T>(defaultState: T): T {
 export function saveState(state: Record<string, unknown>): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    // localStorage full or unavailable — silent fail
+  } catch (e) {
+    if (import.meta.env.DEV) {
+      console.warn('Falha ao salvar estado do jogo:', e);
+    }
   }
 }
 

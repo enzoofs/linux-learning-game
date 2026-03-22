@@ -51,7 +51,7 @@ describe('VirtualFS', () => {
       expect(result.isError).toBe(false);
       expect(result.output).toContain('drwxr-xr-x');
       expect(result.output).toContain('enzo enzo');
-      expect(result.output).toContain('Mar 03 10:00');
+      expect(result.output).toContain('Jan 15 09:00');
       expect(result.output).toContain('Desktop');
     });
 

@@ -52,7 +52,7 @@ export function Terminal({
     const lastLine = lines[lines.length - 1];
     if (lastLine.type === 'error' || lastLine.type === 'feedback') {
       setShakeInput(true);
-      setTimeout(() => setShakeInput(false), 500);
+      setTimeout(() => setShakeInput(false), 300);
     }
     if (lastLine.type === 'success' || lastLine.type === 'levelup') {
       setCelebration(true);
@@ -118,6 +118,7 @@ export function Terminal({
             if (e.key === 'Enter') onSubmit();
           }}
           placeholder={placeholder}
+          aria-label="Terminal de comandos"
           autoFocus
           disabled={disabled}
           className="flex-1 bg-transparent border-none outline-none text-gray-200 font-mono text-sm placeholder:text-slate-600"

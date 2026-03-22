@@ -73,12 +73,18 @@ export const useGameStore = create<GameState & GameActions>()((set, get) => ({
     }),
 
   completeDrill: (attempt) =>
-    set((s) => ({
-      completedDrills: s.completedDrills.includes(attempt.drillId)
-        ? s.completedDrills
-        : [...s.completedDrills, attempt.drillId],
-      drillAttempts: [...s.drillAttempts, attempt],
-    })),
+    set((s) => {
+      const MAX_STORED_ATTEMPTS = 500;
+      const updatedAttempts = [...s.drillAttempts, attempt];
+      return {
+        completedDrills: s.completedDrills.includes(attempt.drillId)
+          ? s.completedDrills
+          : [...s.completedDrills, attempt.drillId],
+        drillAttempts: updatedAttempts.length > MAX_STORED_ATTEMPTS
+          ? updatedAttempts.slice(-MAX_STORED_ATTEMPTS)
+          : updatedAttempts,
+      };
+    }),
 
   completeModule: (moduleId) =>
     set((s) => ({
@@ -164,9 +170,11 @@ export const useGameStore = create<GameState & GameActions>()((set, get) => ({
   getNextTier: () => getNextTier(get().lifetimeXP || get().totalXP),
 
   getXpMultiplier: () => {
+    const STREAK_PLATINUM = 30;
+    const STREAK_GOLD = 7;
     const streak = get().currentStreak;
-    if (streak >= 30) return 2.0;
-    if (streak >= 7) return 1.5;
+    if (streak >= STREAK_PLATINUM) return 2.0;
+    if (streak >= STREAK_GOLD) return 1.5;
     return 1.0;
   },
 

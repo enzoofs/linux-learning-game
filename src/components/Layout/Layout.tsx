@@ -91,11 +91,12 @@ export function Layout({ currentView, onViewChange, children }: LayoutProps) {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex gap-1 mt-4">
+        <nav className="flex gap-1 mt-4" aria-label="Navegacao principal">
           {NAV_TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => onViewChange(tab.id)}
+              aria-current={currentView === tab.id ? 'page' : undefined}
               className={`px-4 py-2 rounded-t-lg text-xs font-semibold transition-all cursor-pointer border ${
                 currentView === tab.id
                   ? 'bg-slate-800 border-slate-700 border-b-slate-800 text-gray-200'
@@ -105,7 +106,7 @@ export function Layout({ currentView, onViewChange, children }: LayoutProps) {
               {tab.label}
             </button>
           ))}
-        </div>
+        </nav>
       </div>
 
       {/* Main Panel */}
